@@ -42,28 +42,40 @@ class PxdFormdef implements Comparable {
    */
   String path
 
-  // Orbeon uuid for saved form definitions
-  // There is a one-to-one mapping between uuid and PxdFormdef
+  /**
+   * Orbeon uuid for saved form definitions
+   * There is a one-to-one mapping between uuid and PxdFormdef
+   */
   String uuid
 
-  // Application name. Part of primary key, may not be modified.
+  /**
+   * Application name. Part of primary key, may not be modified.
+   */
   String appName
 
-  // Form name. Part of primary key, may not be modified.
+  /**
+   * Form name. Part of primary key, may not be modified.
+   */
   String formName
 
-  // Auto timestamping
+  /**
+   * Auto timestamping
+   */
   Date dateCreated
   Date lastUpdated
 
-  // The current draft form definition, the only editable version.
-  // The field must contain the full path of the currentDraft.
-  // Example: alpha/beta--v001_02
-  // Whenever a draft is saved this field must be set.
+  /**
+   * The current draft form definition, the only editable version.
+   * The field must contain the full path of the currentDraft.
+   * Example: alpha/beta--v001_02
+   * Whenever a draft is saved this field must be set.
+   */
   String currentDraft
 
-  // A form definition may have any number of versions
-  // If there are versions, one of them is the current draft (see currentDraft)
+  /**
+   * A form definition may have any number of versions
+   * If there are versions, one of them is the current draft (see currentDraft)
+   */
   SortedSet forms
   static hasMany = [forms: PxdFormdefVer]
 

@@ -44,7 +44,10 @@ class PxdFormdefVer implements Comparable {
   def grailsApplication
 
   private static final log = LogFactory.getLog(this)
-  // Query to find the latest non-withdrawn version of a form definition
+
+  /**
+   * Query to find the latest non-withdrawn version of a form definition
+   */
   static final String LASTVERQ =
     "from PxdFormdefVer as v where appName=? and formName=? and v.draft<${FormdefPath.WITHDRAWN} " +
     'order by v.fvno, v.draft desc'
@@ -57,13 +60,19 @@ class PxdFormdefVer implements Comparable {
    */
   String path
 
-  // Application name. May not be modified.
+  /**
+   * Application name. May not be modified.
+   */
   String appName
 
-  // Form name without version. May not be modified.
+  /**
+   * Form name without version. May not be modified.
+   */
   String formName
 
-  // Form version number. May not be modified.
+  /**
+   * Form version number. May not be modified.
+   */
   Integer fvno
 
   /**
@@ -77,23 +86,35 @@ class PxdFormdefVer implements Comparable {
    */
   Integer draft
 
-  // Auto timestamping
+  /**
+   * Auto timestamping
+   */
   Date dateCreated
   Date lastUpdated
 
-  // Form title
+  /**
+   * Form title
+   */
   String title
 
-  // Form description
+  /**
+   * Form description
+   */
   String description
 
-  // Form language (two-letter abbreviation)
+  /**
+   * Form language (two-letter abbreviation)
+   */
   String language
 
-  // Author (a piece of metadata not used by Orbeon)
+  /**
+   * Author (a piece of metadata not used by Orbeon)
+   */
   String author
 
-  // Url-like reference to the form logo
+  /**
+   * Url-like reference to the form logo
+   */
   String logoRef
 
   static transients = ['currentDraft']

@@ -73,7 +73,7 @@ public class FormdefPath {
 
     /**
      * Construct from a path.
-     * @throw IllegalArgumentException if the path does not have an app and
+     * @throws IllegalArgumentException if the path does not have an app and
      * form name separated by the APP_FORM_SEP separator, or if the version
      * or draft number are out of bounds.
      * (The application will probably prevent this from happening anyway.)

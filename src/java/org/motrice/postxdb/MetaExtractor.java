@@ -82,7 +82,7 @@ public class MetaExtractor extends DefaultHandler {
     /**
      * Extract metadata from an Orbeon form definition.
      * @param formdef Form definition XML
-     * @returns Some items may be null in the returned result.
+     * @return Some items may be null in the returned result.
      * However, if app/form are null this is not a form definition.
      */
     public static FormdefMeta extract(String formdef) throws IOException {
