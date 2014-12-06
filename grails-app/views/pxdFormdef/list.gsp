@@ -37,6 +37,7 @@
       <ul>
 	<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 	<li><g:link class="list" controller="pxdItem" action="list"><g:message code="pxdItem.list.label"/></g:link></li>
+	<li><g:if test="${dbUrl}"><g:link class="list" controller="pxdItem" action="list">${dbUrl.encodeAsHTML()}</g:link></g:if></li>
       </ul>
     </div>
     <div id="list-pxdFormdef" class="content scaffold-list" role="main">
