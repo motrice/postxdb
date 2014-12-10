@@ -32,8 +32,11 @@ import grails.converters.*
  * See BootStrap for XML conversion init.
  */
 class RestPostxdbController {
-  // PostxdbService injection
+  // Service injection
   def postxdbService
+  def restService
+  // For accessing the config
+  def grailsApplication
 
   static CONT_DISP = 'Content-Disposition'
 
@@ -201,6 +204,29 @@ class RestPostxdbController {
       }
     } else {
       render(status: 404)
+    }
+  }
+
+  /**
+   * Add a language to a form.
+   * Begins with the current draft, creates a new draft that becomes current.
+   * PUT $POSTXDB/language/$app/$form?lang=$language-spec
+   */
+  def addlanguage(String spec) {
+    if (log.debugEnabled) log.debug "ADD LANG << ${Util.clean(params)}, ${request.forwardURI}"
+    def enableProp = grailsApplication.config.postxdb.allow.rest.add.language
+    boolean enableFlag = enableProp == 'true'
+    if (enableFlag && spec) {
+      try {
+	def languages = restService.addLanguage(params.app, params.form, spec)
+	render(status: 201, contentType: 'text/plain', text: "Languages added: ${languages}")
+      } catch (PostxdbException exc) {
+	if (log.debugEnabled) log.debug "add lang CONFLICT: ${exc.message}"
+	render(status: exc.http, contentType: 'text/plain', text: exc.message)
+      }
+    } else {
+      if (log.debugEnabled) log.debug "add lang NO-OP: enable=${enableFlag}, lang-spec=${spec}"
+      render(status: 200, contentType: 'text/plain', text: "POSTXDB.114|Not enabled or no language spec")
     }
   }
 

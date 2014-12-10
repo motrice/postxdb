@@ -29,6 +29,7 @@ import org.springframework.dao.DataIntegrityViolationException
 class PxdFormdefController {
 
   def grailsApplication
+  def restService
 
   static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -57,7 +58,7 @@ class PxdFormdefController {
     redirect(action: "show", id: pxdFormdefObj.id)
   }
 
-  def show(Long id) {
+  def addLanguages(Long id) {
     def pxdFormdefObj = PxdFormdef.get(id)
     if (!pxdFormdefObj) {
       flash.message = message(code: 'default.not.found.message', args: [message(code: 'pxdFormdef.label', default: 'PxdFormdef'), id])
@@ -66,6 +67,40 @@ class PxdFormdefController {
     }
 
     [pxdFormdefObj: pxdFormdefObj]
+  }
+
+  def commitLanguages(AddLanguagesCommand cmd) {
+    if (log.debugEnabled) log.debug "COMMIT LANGUAGES: ${params} ${cmd}"
+    def formdef = PxdFormdef.get(params.id)
+    def enableProp = grailsApplication.config.postxdb.allow.gui.add.language
+    boolean enableFlag = enableProp == 'true'
+
+    if (enableFlag) {
+      try {
+	def langList = restService.addLanguage(formdef.appName, formdef.formName, cmd.langSpec)
+	flash.message = message(code: 'pxdFormdef.addLanguage.created',
+	args: [langList?.toString()])
+      } catch (PostxdbException exc) {
+	flash.message = exc.message
+      }
+    } else {
+      flash.message = message(code: 'pxdFormdef.addLanguage.disabled')
+    }
+
+    redirect(action: "show", id: params.id)
+  }
+
+  def show(Long id) {
+    def pxdFormdefObj = PxdFormdef.get(id)
+    if (!pxdFormdefObj) {
+      flash.message = message(code: 'default.not.found.message', args: [message(code: 'pxdFormdef.label', default: 'PxdFormdef'), id])
+      redirect(action: "list")
+      return
+    }
+
+    def enableProp = grailsApplication.config.postxdb.allow.gui.add.language
+    Boolean enableFlag = enableProp == 'true'
+    [pxdFormdefObj: pxdFormdefObj, addLangEnable: enableFlag]
   }
 
   def edit(Long id) {
@@ -126,4 +161,28 @@ class PxdFormdefController {
       redirect(action: "show", id: id)
     }
   }
+}
+
+class AddLanguagesCommand {
+  String srcLang
+  String tgtLang
+
+  def String getSrcLang() {
+    srcLang?.trim()
+  }
+
+  def String getFormatTgtLang() {
+    def langList = []
+    langList.addAll(tgtLang.trim().split(/\s/))
+    return langList.join('.')
+  }
+
+  def String getLangSpec() {
+    "${srcLang}~${formatTgtLang}"
+  }
+
+  String toString() {
+    "[AddLang src:${srcLang} tgt:${tgtLang}]"
+  }
+
 }

@@ -55,6 +55,9 @@ class UrlMappings {
     "/postxdb/duplicate/$srcuuid/$tgtuuid"(controller: 'RestPostxdb') {
       action = [PUT: 'duplicateinstance']
     }
+    "/postxdb/language/$app/$form"(controller: 'RestPostxdb') {
+      action = [PUT: 'addlanguage']
+    }
     "/$controller/$action?/$id?"{
       constraints {
 	// apply constraints here

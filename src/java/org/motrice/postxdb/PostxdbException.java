@@ -54,4 +54,10 @@ public class PostxdbException extends RuntimeException {
 	http = DEFAULT_HTTP_RESPONSE_CODE;
     }
 
+    public PostxdbException(int http, String message) {
+	super(message);
+	this.http = http;
+	this.code = code;
+    }
+
 }

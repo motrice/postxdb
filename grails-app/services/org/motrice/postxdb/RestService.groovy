@@ -49,8 +49,50 @@ class RestService {
   private static final log = LogFactory.getLog(this)
 
   /**
+   * Add a language to a form.
+   * This is a Postxdb method, but its logic fits better here than in
+   * PostxdbService.
+   * Return a list of added languages.
+   */
+  List addLanguage(String appName, String formName, String languageSpec) {
+    if (log.debugEnabled) log.debug "addLanguage << ${appName}/${formName}?spec=${languageSpec}"
+
+    def result = []
+    def formdef = PxdFormdef.findByAppNameAndFormName(appName, formName)
+    if (!formdef) {
+      String msg = "POSTXDB.115|Form def not found with app/form [${appName}/${formName}]"
+      throw new PostxdbException(404, msg)
+    }
+
+    String path = "${formdef.currentDraft}/form.xml"
+    def item = PxdItem.findByPath(path)
+    if (!item) {
+      String msg = "POSTXDB.115|Form def item not found with path [${path}]"
+      throw new PostxdbException(404, msg)
+    }
+
+    def buf = new ByteArrayOutputStream()
+    try {
+      def converter = new XFormsLanguage(item.text)
+      converter.languages(languageSpec)
+      result = converter.tgtLangList
+      converter.validate()
+      if (log.debugEnabled) log.debug "addLanguage ${converter}"
+      converter.process(buf)
+    } catch (IllegalArgumentException exc) {
+      throw new PostxdbException(409, exc.message)
+    }
+
+    String tgtXml = new String(buf.toByteArray(), 'UTF-8')
+    def tgtItem = createDraftItem(formdef.uuid, 'form.xml', tgtXml)
+    if (log.debugEnabled) log.debug "addLanguage >> ${tgtItem} ${result}"
+    return result
+  }
+
+  /**
    * Do everything needed when saving a form definition
    * Creates an associated FormdefVer instance, a Formdef if needed.
+   * NOTE: The resource parameter is currently unused.
    */
   PxdItem createDraftItem(String uuid, String resource, String xml) {
     // Note that the version number, if present, is included in the form name
