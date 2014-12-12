@@ -31,14 +31,16 @@ class XFormsLanguage {
   String srcLang
 
   /**
-   * Target languages found in the title, or null.
+   * Target languages found in the title, or null. List of String.
    */
   List tgtLangList
 
   /**
-   * Set of existing language codes in the form before processing.
+   * Language codes in the form.
+   * Set by the constructor and updated when adding languages.
+   * SortedSet of String.
    */
-  Set prevLangSet
+  SortedSet currentLangSet
 
   /**
    * Construct from form XML.
@@ -49,9 +51,9 @@ class XFormsLanguage {
     def xc = initNamespaces()
     def builder = new Builder()
     doc = builder.build(new StringReader(xmlText))
-    def langSet = new HashSet()
+    def langSet = new TreeSet()
     doc.query('//@xml:lang').each {node -> langSet.add(node.value)}
-    this.prevLangSet = langSet
+    this.currentLangSet = langSet
   }
 
   /**
@@ -86,6 +88,7 @@ class XFormsLanguage {
   /**
    * Add languages according to the language spec.
    * Write the resulting form to an output stream.
+   * Add the new languages to currentLangSet.
    */
   def process(OutputStream out) {
     // Find all instances of the source language
@@ -118,6 +121,7 @@ class XFormsLanguage {
       langAttr.value = tgtLang
       // Use the index to insert copies consecutively
       parent.insertChild(tgtNode, ++srcIdx)
+      currentLangSet.add(tgtLang)
     }
   }
 
@@ -127,13 +131,13 @@ class XFormsLanguage {
    * Returns true if validation passes, otherwise throws an exception.
    */
   def validate() {
-    if (!prevLangSet.contains(srcLang)) {
+    if (!currentLangSet.contains(srcLang)) {
       String msg = "The source language [${srcLang}] is not present in the form"
       throw new IllegalArgumentException("POSTXDB.110|${msg}")
     }
 
     def alreadyThere = tgtLangList.find {tgtLang ->
-      prevLangSet.contains(tgtLang)
+      currentLangSet.contains(tgtLang)
     }
 
     if (alreadyThere) {
@@ -159,7 +163,7 @@ class XFormsLanguage {
   }
 
   String toString() {
-    "[XFormsLanguage prev:${prevLangSet} src:${srcLang} tgt:${tgtLangList}]"
+    "[XFormsLanguage prev:${currentLangSet} src:${srcLang} tgt:${tgtLangList}]"
   }
 
   //------------- Private methods -------------
@@ -193,8 +197,8 @@ class XFormsLanguage {
 
   //--- Read-only setters
 
-  private setPrevLangSet(Set value) {
-    prevLangSet = value
+  private setCurrentLangSet(SortedSet value) {
+    currentLangSet = value
   }
 
   private setSrcLang(String value) {

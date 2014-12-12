@@ -63,6 +63,9 @@ import javax.xml.stream.util.EventReaderDelegate;
  * Typical execution time including one edit: 40 ms.
  * WARNING: Whatever you do, do NOT use the XMLEvent.writeAsEncodedUnicode() method.
  * Use an event writer.
+ * LANGUAGE EDITING is based on now obsolete theory of languages in
+ * Orbeon forms and SHOULD NOT BE USED.
+ * There are other ways of managing form languages.
  */
 public class MetaEditor {
     // Should the event writer attempt to repair namespaces?
@@ -171,7 +174,7 @@ public class MetaEditor {
     }
 
     /**
-     * Indicate that the language should be changed
+     * @deprecated Indicate that the language should be changed.
      * @param targetLanguage must be a two-letter language abbreviation
      */
     public void opLangEdit(String targetLanguage) {

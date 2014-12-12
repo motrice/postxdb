@@ -66,7 +66,7 @@
 	<g:if test="${pxdFormdefVerObj?.language}">
 	  <li class="fieldcontain">
 	    <span id="language-label" class="property-label"><g:message code="pxdFormdefVer.language.label" default="Language" /></span>
-	    <span class="property-value" aria-labelledby="language-label"><g:fieldValue bean="${pxdFormdefVerObj}" field="language"/></span>
+	    <span class="property-value" aria-labelledby="language-label">${formLanguages.encodeAsHTML()}</span>
 	  </li>
 	</g:if>
 	<g:if test="${pxdFormdefVerObj?.appName}">

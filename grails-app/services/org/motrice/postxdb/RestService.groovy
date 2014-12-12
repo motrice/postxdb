@@ -52,30 +52,20 @@ class RestService {
    * Add a language to a form.
    * This is a Postxdb method, but its logic fits better here than in
    * PostxdbService.
-   * Return a list of added languages.
+   * Return a map of languages (Map of List of String).
+   * Entries: added, available.
    */
-  List addLanguage(String appName, String formName, String languageSpec) {
+  Map addLanguage(String appName, String formName, String languageSpec) {
     if (log.debugEnabled) log.debug "addLanguage << ${appName}/${formName}?spec=${languageSpec}"
 
-    def result = []
-    def formdef = PxdFormdef.findByAppNameAndFormName(appName, formName)
-    if (!formdef) {
-      String msg = "POSTXDB.115|Form def not found with app/form [${appName}/${formName}]"
-      throw new PostxdbException(404, msg)
-    }
-
-    String path = "${formdef.currentDraft}/form.xml"
-    def item = PxdItem.findByPath(path)
-    if (!item) {
-      String msg = "POSTXDB.115|Form def item not found with path [${path}]"
-      throw new PostxdbException(404, msg)
-    }
-
+    def result = [:]
+    def form = findFormdefAndItem(appName, formName)
     def buf = new ByteArrayOutputStream()
     try {
-      def converter = new XFormsLanguage(item.text)
+      def converter = new XFormsLanguage(form.item.text)
       converter.languages(languageSpec)
-      result = converter.tgtLangList
+      result.added = converter.tgtLangList
+      result.available = converter.currentLangSet
       converter.validate()
       if (log.debugEnabled) log.debug "addLanguage ${converter}"
       converter.process(buf)
@@ -84,9 +74,87 @@ class RestService {
     }
 
     String tgtXml = new String(buf.toByteArray(), 'UTF-8')
-    def tgtItem = createDraftItem(formdef.uuid, 'form.xml', tgtXml)
+    def tgtItem = createDraftItem(form.formdef.uuid, 'form.xml', tgtXml)
     if (log.debugEnabled) log.debug "addLanguage >> ${tgtItem} ${result}"
     return result
+  }
+
+  /**
+   * Find available languages in a form.
+   * Return a list of languages sorted alphabetically (List of String).
+   * A language may be a Java-style locale, like "en_US".
+   */
+  List findAvailableLanguages(String appName, String formName, String version) {
+    if (log.debugEnabled) log.debug "findAvailableLanguages << ${appName}/${formName}[${version}]"
+    def form = findFormdefAndItem(appName, formName, version)
+    def result = doFindAvailableLanguages(form.item)
+    if (log.debugEnabled) log.debug "findAvailableLanguages >> ${result}"
+    return result
+  }
+
+  List findAvailableLanguages(PxdFormdefVer formver) {
+    if (log.debugEnabled) log.debug "findAvailableLanguages << ${formver}"
+    def item = PxdItem.findByPath("${formver.path}/form.xml")
+    if (!item) {
+      String msg = "POSTXDB.115|Form def item not found with path [${path}]"
+      throw new PostxdbException(404, msg)
+    }
+
+    def result = doFindAvailableLanguages(item)
+    if (log.debugEnabled) log.debug "findAvailableLanguages >> ${result}"
+    return result
+  }
+
+  private List doFindAvailableLanguages(PxdItem item) {
+    def result = []
+    try {
+      def converter = new XFormsLanguage(item.text)
+      result.addAll(converter.currentLangSet)
+    } catch (IllegalArgumentException exc) {
+      throw new PostxdbException(409, exc.message)
+    }
+
+    return result
+  }
+
+  /**
+   * Find a form definition and item containing the XML form definition.
+   * version may be a published or draft version number (like v002_3) or null.
+   * The current draft is returned if the version is null.
+   * Return a map with the following entries:
+   * formdef: a form definition (PxdFormdef),
+   * item: the form definition XML (PxdItem).
+   * Throw PostxdbException if not found.
+   */
+  private Map findFormdefAndItem(String appName, String formName, String version) {
+    def formdef = PxdFormdef.findByAppNameAndFormName(appName, formName)
+    if (!formdef) {
+      String msg = "POSTXDB.115|Form def not found with app/form [${appName}/${formName}]"
+      throw new PostxdbException(404, msg)
+    }
+
+    String path = '/form.xml'
+    if (version) {
+      path = "${formdef.path}--${version}${path}"
+    } else {
+      path = "${formdef.currentDraft}${path}"
+    }
+    
+    def item = PxdItem.findByPath(path)
+    if (!item) {
+      String msg = "POSTXDB.115|Form def item not found with path [${path}]"
+      throw new PostxdbException(404, msg)
+    }
+
+    if (log.debugEnabled) log.debug "formdefAndItem(${path}): ${formdef}${item}"
+    return [formdef: formdef, item: item]
+  }
+
+  /**
+   * Convenience for omitting the version and getting the current draft.
+   */
+  private Map findFormdefAndItem(String appName, String formName) {
+    findFormdefAndItem(appName, formName, null)
   }
 
   /**

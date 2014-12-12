@@ -212,21 +212,68 @@ class RestPostxdbController {
    * Begins with the current draft, creates a new draft that becomes current.
    * PUT $POSTXDB/language/$app/$form?lang=$language-spec
    */
-  def addlanguage(String spec) {
+  def languageadd(String spec) {
     if (log.debugEnabled) log.debug "ADD LANG << ${Util.clean(params)}, ${request.forwardURI}"
     def enableProp = grailsApplication.config.postxdb.allow.rest.add.language
     boolean enableFlag = enableProp == 'true'
     if (enableFlag && spec) {
       try {
-	def languages = restService.addLanguage(params.app, params.form, spec)
-	render(status: 201, contentType: 'text/plain', text: "Languages added: ${languages}")
+	def langMap = restService.addLanguage(params.app, params.form, spec)
+	def writer = new StringWriter()
+	def xml = new groovy.xml.MarkupBuilder(writer)
+	xml.languages {
+	  added {
+	    langMap.added.each {langName ->
+	      language(langName)
+	    }
+	  }
+	  available {
+	    langMap.available.each {langName ->
+	      language(langName)
+	    }
+	  }
+	}
+	render(status: 201, contentType: 'text/xml;charset=UTF-8', text: writer.toString())
       } catch (PostxdbException exc) {
 	if (log.debugEnabled) log.debug "add lang CONFLICT: ${exc.message}"
-	render(status: exc.http, contentType: 'text/plain', text: exc.message)
+	// Do it the right way to get XML escaping
+	def writer = new StringWriter()
+	def xml = new groovy.xml.MarkupBuilder(writer)
+	xml.conflict(exc.message)
+	render(status: exc.http, contentType: 'text/xml;charset=UTF-8',	text: writer.toString())
       }
     } else {
       if (log.debugEnabled) log.debug "add lang NO-OP: enable=${enableFlag}, lang-spec=${spec}"
-      render(status: 200, contentType: 'text/plain', text: "POSTXDB.114|Not enabled or no language spec")
+      def writer = new StringWriter()
+      def xml = new groovy.xml.MarkupBuilder(writer)
+      xml.conflict('POSTXDB.114|Not enabled or no language spec')
+      render(status: 200, contentType: 'text/xml;charset=UTF-8', text: writer.toString())
+    }
+  }
+
+  /**
+   * List available languages in a form.
+   * GET $POSTXDB/language/$app/$form[?version=$version]
+   */
+  def languagelist(String version) {
+    if (log.debugEnabled) log.debug "GET LANG << ${Util.clean(params)}, ${request.forwardURI}"
+    try {
+      def langList = restService.findAvailableLanguages(params.app, params.form, version)
+      def writer = new StringWriter()
+      def xml = new groovy.xml.MarkupBuilder(writer)
+      xml.languages {
+	langList.each {langName ->
+	  language(langName)
+	}
+      }
+      render(status: 200, contentType: 'text/xml;charset=UTF-8', text: writer.toString())
+    } catch (PostxdbException exc) {
+      if (log.debugEnabled) log.debug "add lang CONFLICT: ${exc.message}"
+      // Do it the right way to get XML escaping
+      def writer = new StringWriter()
+      def xml = new groovy.xml.MarkupBuilder(writer)
+      xml.conflict(exc.message)
+      render(status: exc.http, contentType: 'text/xml;charset=UTF-8',	text: writer.toString())
     }
   }
 
