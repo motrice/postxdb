@@ -1,0 +1,5 @@
+Maven currently cannot run tests on this project.
+They can be run from the Grails command line like this: grails test-app
+
+Include this command line option when building with Maven:
+-Dmaven.test.skip=true
