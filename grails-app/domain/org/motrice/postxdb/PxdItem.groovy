@@ -33,6 +33,13 @@ import java.security.MessageDigest
  * when deviating from Grails common conventions.
  */
 class PxdItem {
+  // Form data suffix
+  static public String FORM_DATA_SUFFIX = 'data.xml'
+  // Published form definition suffix
+  static public String FORMDEF_PUBLISHED_SUFFIX = 'form.xhtml'
+  // Draft form definition suffix
+  static public String FORMDEF_DRAFT_SUFFIX = 'form.xml'
+
   // Injection magic
   def grailsApplication
 
@@ -150,9 +157,49 @@ class PxdItem {
    * ASSUMES the item is an instance.
    */
   static PxdItem formDataCopy(PxdItem otherItem, String uuid) {
-    def item = new PxdItem(path: "${uuid}/data.xml", uuid: uuid, formDef: otherItem.formDef,
+    def item = new PxdItem(path: "${uuid}/${FORM_DATA_SUFFIX}", uuid: uuid, formDef: otherItem.formDef,
     instance: true, origin: otherItem, format: otherItem.format)
     return item.assignText(otherItem.text)
+  }
+
+  /**
+   * Find a form definition item from form definition metadata and
+   * an explicit version.
+   * The version syntax should be like "v004" or "v004_3", or null.
+   * The current draft version is selected if the version is null.
+   * Throws IllegalArgumentException if version syntax is not correct.
+   */
+  static PxdItem retrieveDef(PxdFormdef formdef, String version) {
+    String path = version? "${formdef.path}--${version}" : formdef.currentDraft
+    def verPath = new FormdefPath(path)
+    retrieveDef(verPath)
+  }
+
+  /**
+   * Find the current draft form definition item.
+   * May throw IllegalArgumentException, but that would signify a deeper problem.
+   */
+  static PxdItem retrieveDef(PxdFormdef formdef) {
+    retrieveDef(formdef, null)
+  }
+
+  /**
+   * Find a form definition item from form definition version metadata.
+   * Returns one item, or null.
+   */
+  static PxdItem retrieveDef(PxdFormdefVer formver) {
+    PxdItem.findByPath("${formver.path}/${formdefSuffix(formver.published)}")
+  }
+
+  /**
+   * Find a form definition given an application path.
+   */
+  static PxdItem retrieveDef(FormdefPath path) {
+    PxdItem.findByPath("${path.toString()}/${formdefSuffix(path.published)}")
+  }
+
+  static String formdefSuffix(boolean published) {
+    published? FORMDEF_PUBLISHED_SUFFIX : FORMDEF_DRAFT_SUFFIX
   }
 
   // Assign stream

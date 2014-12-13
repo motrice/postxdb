@@ -204,6 +204,14 @@ class PxdFormdefVer implements Comparable {
     return fmt.format(lastUpdated)
   }
 
+  boolean isPublished() {
+    new FormdefPath(path).published
+  }
+
+  String getItemSuffix() {
+    published? 'form.xhtml' : 'form.xml'
+  }
+
   String display() {
     "${path}: ${title}"
   }
@@ -213,10 +221,10 @@ class PxdFormdefVer implements Comparable {
   }
 
   /**
-   * Bootstrap init causes this method to be used for rendering as XML
+   * Bootstrap init causes this method to be used for rendering as XML.
    */
   def toXML(xml) {
-    boolean publishedFlag = new FormdefPath(path).published
+    boolean publishedFlag = published
     xml.build {
       ref(id)
       formref(formdef.id)

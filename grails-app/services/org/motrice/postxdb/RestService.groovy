@@ -94,7 +94,8 @@ class RestService {
 
   List findAvailableLanguages(PxdFormdefVer formver) {
     if (log.debugEnabled) log.debug "findAvailableLanguages << ${formver}"
-    def item = PxdItem.findByPath("${formver.path}/form.xml")
+    def path = formver.path
+    def item = PxdItem.retrieveDef(formver)
     if (!item) {
       String msg = "POSTXDB.115|Form def item not found with path [${path}]"
       throw new PostxdbException(404, msg)
@@ -119,7 +120,7 @@ class RestService {
 
   /**
    * Find a form definition and item containing the XML form definition.
-   * version may be a published or draft version number (like v002_3) or null.
+   * version may be a published or draft version number (like v002_03) or null.
    * The current draft is returned if the version is null.
    * Return a map with the following entries:
    * formdef: a form definition (PxdFormdef),
@@ -127,26 +128,27 @@ class RestService {
    * Throw PostxdbException if not found.
    */
   private Map findFormdefAndItem(String appName, String formName, String version) {
+    if (log.debugEnabled) log.debug "formdefAndItem << ${appName}/${formName}[${version}]"
     def formdef = PxdFormdef.findByAppNameAndFormName(appName, formName)
     if (!formdef) {
       String msg = "POSTXDB.115|Form def not found with app/form [${appName}/${formName}]"
       throw new PostxdbException(404, msg)
     }
 
-    String path = '/form.xml'
-    if (version) {
-      path = "${formdef.path}--${version}${path}"
-    } else {
-      path = "${formdef.currentDraft}${path}"
+    def item = null
+    try {
+      item = PxdItem.retrieveDef(formdef, version)
+    } catch (IllegalArgumentException exc) {
+      String msg = "POSTXDB.116|Invalid version syntax [${version}]"
+      throw new PostxdbException(409, msg)
     }
-    
-    def item = PxdItem.findByPath(path)
+
     if (!item) {
       String msg = "POSTXDB.115|Form def item not found with path [${path}]"
       throw new PostxdbException(404, msg)
     }
 
-    if (log.debugEnabled) log.debug "formdefAndItem(${path}): ${formdef}${item}"
+    if (log.debugEnabled) log.debug "formdefAndItem >> ${formdef}${item}"
     return [formdef: formdef, item: item]
   }
 
@@ -230,8 +232,7 @@ class RestService {
     def result = null
     def formdef = PxdFormdef.findByUuid(uuid)
     if (formdef) {
-      String itemPath = "${formdef.currentDraft}/form.xml"
-      result = PxdItem.findByPath(itemPath)
+      result = PxdItem.retrieveDef(formdef)
     }
 
     if (log.debugEnabled) log.debug "findCurrentDraft returns ${result}"
@@ -285,8 +286,7 @@ class RestService {
       def latestVersion = versionList[0]
       def latestPath = new FormdefPath(path.appName, FormdefPath.LIBRARY_NAME,
 				       latestVersion.fvno, FormdefPath.PUBLISHED)
-      String itemPath = "${latestPath}/form.xhtml"
-      result = PxdItem.findByPath(itemPath)
+      result = PxdItem.retrieveDef(latestPath)
     }
 
     if (log.debugEnabled) log.debug "findLibraryForm >> ${result}"
