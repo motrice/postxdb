@@ -52,11 +52,11 @@ class UrlMappings {
     "/postxdb/readonly/$uuid"(controller: 'RestPostxdb') {
       action = [GET: 'readonlyget', PUT: 'readonlyset']
     }
+    "/postxdb/data/array/$app/$form/$version"(controller: 'RestPostxdb') {
+      action = [POST: 'putnamevalue']
+    }
     "/postxdb/duplicate/$srcuuid/$tgtuuid"(controller: 'RestPostxdb') {
       action = [PUT: 'duplicateinstance']
-    }
-    "/postxdb/language/$app/$form"(controller: 'RestPostxdb') {
-      action = [GET: 'languagelist', PUT: 'languageadd']
     }
     "/$controller/$action?/$id?"{
       constraints {

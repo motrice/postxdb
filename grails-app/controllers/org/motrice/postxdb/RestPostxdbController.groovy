@@ -273,7 +273,23 @@ class RestPostxdbController {
       def writer = new StringWriter()
       def xml = new groovy.xml.MarkupBuilder(writer)
       xml.conflict(exc.message)
-      render(status: exc.http, contentType: 'text/xml;charset=UTF-8',	text: writer.toString())
+      render(status: exc.http, contentType: 'text/xml;charset=UTF-8', text: writer.toString())
+    }
+  }
+
+  def putnamevalue() {
+    if (log.debugEnabled) log.debug "PUT NVARRAY << ${Util.clean(params)}, ${request.forwardURI}"
+    def item = null
+    try {
+      item = restService.createFormdataFromArray(params.app, params.form, params.version, request.reader.text)
+      render(status: 201, contentType: 'text/plain;charset=UTF-8', text: item.uuid)
+    } catch (PostxdbException exc) {
+      if (log.debugEnabled) log.debug "put nvarray CONFLICT: ${exc.message}"
+      // Do it the right way to get XML escaping
+      def writer = new StringWriter()
+      def xml = new groovy.xml.MarkupBuilder(writer)
+      xml.conflict(exc.message)
+      render(status: exc.http, contentType: 'text/xml;charset=UTF-8', text: writer.toString())
     }
   }
 

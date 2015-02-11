@@ -26,6 +26,9 @@ package org.motrice.postxdb
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+import grails.converters.*
+import groovy.xml.MarkupBuilder
+
 // The only way to create a logger with a predictable name
 import org.apache.commons.logging.LogFactory
 
@@ -47,6 +50,8 @@ import org.motrice.postxdb.MetaExtractor;
  */
 class RestService {
   private static final log = LogFactory.getLog(this)
+
+  private static final XML_PROLOG = '<?xml version="1.0" encoding="UTF-8"?>'
 
   /**
    * Add a language to a form.
@@ -596,6 +601,107 @@ class RestService {
 
     if (log.debugEnabled) log.debug "extractSearchParameters: ${map}"
     return map
+  }
+
+  /**
+   * Create and store a new form instance based on a form def type
+   * and an array of name-value pairs.
+   * Return the item just created.
+   */
+  PxdItem createFormdataFromArray(String appName, String formName, String version,
+				 String jsonArray)
+  {
+    if (log.debugEnabled) log.debug "createFormdataFromArray << ${appName}/${formName}--${version} (JSON size: ${jsonArray.size()})"
+    // A lot of input checking befor the action begins.
+    def inputArray = null
+    try {
+      inputArray = JSON.parse(jsonArray)
+      if (!(inputArray instanceof Map)) throw IllegalArgumentException('Input is not an array')
+    } catch (Exception exc) {
+      String msg = "POSTXDB.117|Conflict when decoding JSON input array [${exc.message}]"
+      throw new PostxdbException(409, msg)
+    }
+
+    def form = findFormdefAndItem(appName, formName, version)
+    if (form.item.readOnly) {
+      String msg = "Item is read-only: ${form?.item?.path}"
+      throw new PostxdbException(403, msg)
+    }
+
+    def controls = null
+    try { 
+      controls = formdefControlList(form.item.text)
+    } catch (Exception exc) {
+      String msg = "POSTXDB.118|Conflict when decoding form definition [${exc.message}]"
+      throw new PostxdbException(409, msg)
+    }
+
+    def xml = doCreateFormdataFromArray(inputArray, controls)
+    def uuid = UUID.randomUUID().toString()
+    def result = createInstanceItem(appName, "${formName}--${version}", uuid,
+				    'data.xml', XML_PROLOG + xml)
+    if (log.debugEnabled) log.debug "createFormdataFromArray >> ${result}"
+    return result
+  }
+
+  /**
+   * Create form data XML from input.
+   * Return an XML string.
+   */
+  private String doCreateFormdataFromArray(Map inputArray, List controls) {
+    def writer = new StringWriter()
+    def xml = new MarkupBuilder(writer)
+    xml.form() {
+      controls.each {section ->
+	"${section.section}"() {
+	  section.controls.each {controlName ->
+	    def value = inputArray[controlName] ?: ''
+	    "${controlName}"(value)
+	  }
+	}
+      }
+    }
+
+    def result = writer.toString()
+    if (log.debugEnabled) log.debug "doCreateFormdataFromArray >> ${result}"
+    return result
+  }
+
+  /**
+   * Given a published form definition, extract section and
+   * control names.
+   * formXml must be the form definition contents.
+   * The result is a list of arrays.
+   * The arrays have entries "section" and "controls".
+   * Each "controls" entry is a list of control names.
+   * The SAX parser throws exception on conflict.
+   * NOTE: Tested only with published form definitions.
+   */
+  private List formdefControlList(String formXml) {
+    def xml = new XmlSlurper().parseText(formXml)
+    def instance = xml.'**'.find {it.@id == 'fr-form-instance'}
+    def sections = []
+    instance.form.'*'.each {section ->
+      def sectionName = section.name()
+      def descr = [section: sectionName]
+      def controls = []
+      section.'*'.each {control ->
+	def controlName = control.name()
+	def value = null
+	controls << controlName
+      }
+      descr.controls = controls
+      sections << descr
+    }
+
+    return sections
+  }
+
+  /**
+   * Convert a JSON form control list back to Java.
+   */
+  private List controlListFromJson(String jsonMap) {
+    JSON.parse(jsonMap)
   }
 
   /**
