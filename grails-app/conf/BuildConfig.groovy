@@ -66,7 +66,7 @@ grails.project.dependency.resolution = {
 
   dependencies {
     // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes
-    //compile "xom:xom:1.2.5"
+    runtime "xom:xom:1.2.10"
     runtime "postgresql:postgresql:9.2-1002.jdbc4"
   }
 
