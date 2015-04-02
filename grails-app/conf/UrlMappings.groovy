@@ -24,16 +24,32 @@
 class UrlMappings {
 
   static mappings = {
+    "/rest/db/orbeon-pe/fr"(controller: 'RestFormdata') {
+      action = [POST: 'collectionQuery']
+    }
+    "/rest/db/orbeon-pe/fr/orbeon/builder/data"(controller: 'RestFormdef', action: 'list')
     "/rest/db/orbeon-pe/fr/$app/$form/form/$resource"(controller: 'RestFormdef') {
       action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
     }
-    "/rest/db/orbeon-pe/fr/orbeon/builder/data/$uuid/$resource"(controller: 'RestResource') {
+    // Next pattern compensates for an Orbeon bug
+    "/rest/db/orbeon-pe/fr//$app/$form/form/$resource"(controller: 'RestFormdef') {
       action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
     }
     "/rest/db/orbeon-pe/fr/$app/$form/data/$uuid/$resource"(controller: 'RestFormdata') {
       action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
     }
-    "/rest/db/orbeon-pe/fr/orbeon/builder/data"(controller: 'RestFormdef', action: 'list')
+    // Next pattern compensates for an Orbeon bug
+    "/rest/db/orbeon-pe/fr//$app/$form/data/$uuid/$resource"(controller: 'RestFormdata') {
+      action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
+    }
+    "/rest/db/orbeon-pe/fr/orbeon/builder/data/$uuid/$resource"(controller: 'RestResource') {
+      action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
+    }
+    // Next pattern compensates for an Orbeon bug
+    "/rest/db/orbeon-pe/fr//orbeon/builder/data/$uuid/$resource"(controller: 'RestResource') {
+      action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
+    }
+    // Here are the Postxdb (non-Orbeon) methods
     "/postxdb/formdef/$id?"(controller: 'RestPostxdb') {
       action = [GET: 'formdefget']
     }

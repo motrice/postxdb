@@ -35,6 +35,18 @@ class RestFormdataController {
   // RestService injection
   def restService
 
+  private static final String STANDARD_QUERY_RESPONSE = '<exist:result xmlns:exist="http://exist.sourceforge.net/NS/exist" exist:hits="1" exist:start="1" exist:count="1"><data-exists>false</data-exists></exist:result>'
+
+  /**
+   * Orbeon precedes a storage operation with a query to check if the intended collection exists.
+   * Our response is to deny its existence.
+   */
+  def collectionQuery() {
+    if (log.debugEnabled) log.debug "COLLECTION QUERY: ${Util.clean(params)}, ${request.forwardURI}"
+    render(status: 200, contentType: 'application/xml', encoding: 'UTF-8',
+    text: STANDARD_QUERY_RESPONSE)
+  }
+
   /**
    * Get a resource for a form instance
    */
