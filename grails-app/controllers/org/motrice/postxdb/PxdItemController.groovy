@@ -106,6 +106,10 @@ class PxdItemController {
     render(view: 'show', model: [pxdItemObj: pxdItemObj])
   }
 
+  /**
+   * The only edit operation is search-replace.
+   * No restrictions, may create XML havoc.
+   */
   def edit(Long id) {
     if (log.debugEnabled) log.debug "EDIT ${params}"
     def pxdItemObj = PxdItem.get(id)
@@ -118,6 +122,11 @@ class PxdItemController {
     [pxdItemObj: pxdItemObj]
   }
 
+  /**
+   * Do a search-replace on item contents.
+   * There are no checks, unreasonable changes will get through.
+   * TODO: Does not check the read-only flag.
+   */
   def update(SearchReplaceCommand cmd, Long version) {
     if (log.debugEnabled) log.debug "UPDATE ${params}: ${cmd}"
     def pxdItemObj = PxdItem.get(cmd?.id)

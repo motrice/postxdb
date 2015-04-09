@@ -35,14 +35,17 @@ class RestFormdataController {
   // RestService injection
   def restService
 
-  private static final String STANDARD_QUERY_RESPONSE = '<exist:result xmlns:exist="http://exist.sourceforge.net/NS/exist" exist:hits="1" exist:start="1" exist:count="1"><data-exists>false</data-exists></exist:result>'
+  private static final String STANDARD_QUERY_RESPONSE = '<exist:result xmlns:exist="http://exist.sourceforge.net/NS/exist" exist:hits="1" exist:start="1" exist:count="1"><data-exists>true</data-exists></exist:result>'
 
   /**
    * Orbeon precedes a storage operation with a query to check if the intended collection exists.
-   * Our response is to deny its existence.
+   * In this implementation we respond that the collection exists.
+   * Orbeon does not care a lot because it also sends an eXist-db query that creates the collection.
+   * We have tested to respond "true" or "false" to all queries, no difference.
+   * This is a new roundtrip introduced in Orbeon 4.8, spend the least time possible here.
    */
-  def collectionQuery() {
-    if (log.debugEnabled) log.debug "COLLECTION QUERY: ${Util.clean(params)}, ${request.forwardURI}"
+  def collectionQuery(String collection) {
+    if (log.debugEnabled) log.debug "COLLECTION QUERY: ${collection}, ${Util.clean(params)}, ${request.forwardURI}"
     render(status: 200, contentType: 'application/xml', encoding: 'UTF-8',
     text: STANDARD_QUERY_RESPONSE)
   }

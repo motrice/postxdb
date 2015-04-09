@@ -458,7 +458,7 @@ class RestService {
    * In the normal case the resource already exists and nothing needs to be done
    */
   PxdItem createPublishedResource(String appName, String formName, String resource,
-				 request)
+				  request)
   {
     if (log.debugEnabled) {
       log.debug "createPublishedResource << ${appName}/${formName}/${resource}"

@@ -78,6 +78,8 @@ class PxdItem {
 
   /**
    * If true, this item may not be overwritten.
+   * Meaningful only for instances.
+   * Form definitions are never overwritten, each save creates a new draft.
    */
   Boolean readOnly
 
