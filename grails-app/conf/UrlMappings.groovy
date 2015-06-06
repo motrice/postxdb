@@ -38,20 +38,6 @@ class UrlMappings {
     "/rest/db/orbeon-pe/fr/orbeon/builder/data/$uuid/$resource"(controller: 'RestResource') {
       action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
     }
-    //----- Patterns for buggy Orbeon 4.8 -----
-    "/rest/db/orbeon-48/fr//$app/$form/form/$resource"(controller: 'RestFormdef') {
-      action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
-    }
-    "/rest/db/orbeon-48/fr//$app/$form/data/$uuid/$resource"(controller: 'RestFormdata') {
-      action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
-    }
-    "/rest/db/orbeon-48/fr//orbeon/builder/data/$uuid/$resource"(controller: 'RestResource') {
-      action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
-    }
-    "/rest/db/orbeon-48/fr"(controller: 'RestFormdata') {
-      action = [POST: 'collectionQuery']
-    }
-    "/rest/db/orbeon-48/fr/orbeon/builder/data"(controller: 'RestFormdef', action: 'list')
     //----- Here are the Postxdb (non-Orbeon) methods -----
     "/postxdb/formdef/$id?"(controller: 'RestPostxdb') {
       action = [GET: 'formdefget']
