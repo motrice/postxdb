@@ -116,6 +116,30 @@ class RestFormdataController {
   }
 
   /**
+   * Create a new, empty instance for the given form.
+   * Checks that the form definition exists, then creates a new item.
+   * RETURNS the uuid of the new item.
+   * NOTE: This is a non-Orbeon operation so we return some text in case of conflict.
+   */
+  def newop() {
+    if (log.debugEnabled) log.debug "NEWOP << ${Util.clean(params)}, ${request.forwardURI}"
+    def itemObj = null
+    def status = 201
+    def text = ''
+
+    try {
+      itemObj = restService.createEmptyInstanceItem(params.app, params.form)
+      text = itemObj.uuid
+    } catch (PostxdbException exc) {
+      status = exc.http
+      text = "${exc.code}|${message(code: exc.code)}"
+    }
+
+    if (log.debugEnabled) log.debug "NEWOP >> (${status}) '${text}'"
+    render(status: status, contentType: 'text/plain', text: text)
+  }
+
+  /**
    * Delete a form definition resource.
    */
   def delete() {

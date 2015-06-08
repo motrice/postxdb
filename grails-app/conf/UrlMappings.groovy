@@ -35,6 +35,10 @@ class UrlMappings {
     "/rest/db/orbeon-pe/fr/$app/$form/data/$uuid/$resource"(controller: 'RestFormdata') {
       action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
     }
+    // This is a non-Orbeon method that is closely related to the previous one.
+    "/rest/db/orbeon-pe/fr/$app/$form/newinstance"(controller: 'RestFormdata') {
+      action = [PUT: 'newop']
+    }
     "/rest/db/orbeon-pe/fr/orbeon/builder/data/$uuid/$resource"(controller: 'RestResource') {
       action = [GET: 'getop', PUT: 'putop', DELETE: 'delete']
     }

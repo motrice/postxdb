@@ -507,6 +507,35 @@ class RestService {
   }
 
   /**
+   * Check that the form definition exists, then create an empty item.
+   * Among other things, we generate the instance uuid.
+   */
+  PxdItem createEmptyInstanceItem(String appName, String formName) {
+    if (log.debugEnabled) log.debug "createEmptyInstanceItem << ${appName}/${formName}"
+    def path = null
+    try {
+      path = new FormdefPath("${appName}/${formName}")
+    } catch (IllegalArgumentException exc) {
+      // This is almost impossible to provoke
+      throw new PostxdbException('POSTXDB.117', "Syntax error: '${appName}/${formName}'")
+    }
+
+    def formdefVer = PxdFormdefVer.findByPath(path.toString())
+    if (!formdefVer) {
+      def exc = new PostxdbException('POSTXDB.118',
+				     "Form definition not found '${path.toString()}'")
+      exc.http = 404
+      throw exc
+    }
+
+    def bigInt = new java.math.BigInteger(160, new java.security.SecureRandom())
+    def uuid = bigInt.toString(16).padLeft(20, '0')
+    def item = createInstanceItem(appName, formName, uuid, 'data.xml', '')
+    if (log.debugEnabled) log.debug "createEmptyInstanceItem >> ${item}"
+    return item
+  }
+
+  /**
    * Create a resource for a form instance, typically an attachment
    * Very similar to createPublishedResource
    */
