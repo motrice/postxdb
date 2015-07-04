@@ -24,6 +24,7 @@
 package org.motrice.postxdb
 
 import grails.test.mixin.*
+import grails.test.mixin.support.GrailsUnitTestMixin
 
 import org.junit.*
 import org.motrice.postxdb.FormdefPath;
@@ -31,8 +32,8 @@ import org.motrice.postxdb.FormdefPath;
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
+@TestMixin(GrailsUnitTestMixin)
 class FormdefPathTests {
-  final shouldFail = new GroovyTestCase().&shouldFail
 
   void testPathConstruct() {
     def fdp = new FormdefPath('alpha/beta')

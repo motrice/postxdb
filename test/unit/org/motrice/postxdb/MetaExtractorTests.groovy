@@ -24,6 +24,7 @@
 package org.motrice.postxdb
 
 import grails.test.mixin.*
+import grails.test.mixin.support.GrailsUnitTestMixin
 
 import org.junit.*
 import org.motrice.postxdb.MetaExtractor;
@@ -32,8 +33,8 @@ import org.motrice.postxdb.MetaExtractor;
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  * XML files used by the tests are located in the main project directory
  */
+@TestMixin(GrailsUnitTestMixin)
 class MetaExtractorTests {
-  final shouldFail = new GroovyTestCase().&shouldFail
 
   void testBasics() {
     def formFile = new File('submarine-rescue-form.xhtml')

@@ -35,6 +35,7 @@ grails.project.source.level = 1.6
 //   run: [maxMemory:1024, minMemory:64, debug:false, maxPerm:256]
 //]
 
+grails.project.dependency.resolver = 'maven'
 grails.project.dependency.resolution = {
   pom true
   // inherit Grails' default dependencies
@@ -66,24 +67,25 @@ grails.project.dependency.resolution = {
 
   dependencies {
     // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes
-    runtime "xom:xom:1.2.10"
-    runtime "postgresql:postgresql:9.2-1002.jdbc4"
+    //    runtime "xom:xom:1.2.10"
+    //runtime "postgresql:postgresql:9.4-1201.jdbc41"
   }
 
   plugins {
-    runtime ":hibernate:$grailsVersion"
-    runtime ":jquery:1.8.3"
-    runtime ":resources:1.1.6"
+    runtime ":hibernate:3.6.10.19"
+    runtime ":jquery:1.11.1"
+    //runtime ":resources:1.2.14" ----- should not be used after 2.4
+    compile ":asset-pipeline:2.3.9"
 
     // Uncomment these (or add new ones) to enable additional resources capabilities
     //runtime ":zipped-resources:1.0"
     //runtime ":cached-resources:1.0"
     //runtime ":yui-minify-resources:0.1.5"
 
-    //build ":tomcat:$grailsVersion"
+    build ":tomcat:8.0.22"
 
-    runtime ":database-migration:1.3.2"
+    runtime ":database-migration:1.4.0"
 
-    compile ':cache:1.0.1'
+    compile ':cache:1.1.8'
   }
 }

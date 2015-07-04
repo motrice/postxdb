@@ -1,12 +1,13 @@
 package org.motrice.postxdb
 
 import grails.test.mixin.*
+import grails.test.mixin.support.GrailsUnitTestMixin
 
 import org.junit.*
 import org.motrice.postxdb.XFormsLanguage
 
+@TestMixin(GrailsUnitTestMixin)
 class XFormsLanguageTests {
-  final shouldFail = new GroovyTestCase().&shouldFail
 
   void testBasics() {
     def formFile = new File('submarine-rescue-form.xhtml')
