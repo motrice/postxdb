@@ -6,7 +6,7 @@
   <groupId>org.motrice</groupId>
   <artifactId>exist</artifactId>
   <packaging>grails-app</packaging>
-  <version>1.0.10</version>
+  <version>1.0.11</version>
   <name>exist</name>
   <description>exist</description>
 
