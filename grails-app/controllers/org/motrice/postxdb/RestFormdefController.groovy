@@ -40,6 +40,7 @@ import org.motrice.postxdb.FormdefPath;
 class RestFormdefController {
   // RestService injection
   def restService
+  def grailsApplication
 
   /**
    * Generate a list of forms available for editing.
@@ -158,6 +159,8 @@ class RestFormdefController {
     }
 
     if (itemObj) {
+      def pathHeader = grailsApplication.config.postxdb.itempath.header
+      if (pathHeader) header(pathHeader, itemObj.path)
       // The response must be empty, or Orbeon chokes
       render(status: 201)
     } else {

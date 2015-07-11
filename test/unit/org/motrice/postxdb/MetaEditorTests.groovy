@@ -36,9 +36,10 @@ import org.motrice.postxdb.MetaExtractor;
  */
 @TestMixin(GrailsUnitTestMixin)
 class MetaEditorTests {
+  static final DATADIR = new File('datafortests')
 
   void testBasics() {
-    def formFile = new File('submarine-rescue-form.xhtml')
+    def formFile = new File(DATADIR, 'submarine-rescue-form.xhtml')
 
     // Make sure we know the initial state
     def meta = MetaExtractor.extract(formFile.text)

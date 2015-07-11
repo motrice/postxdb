@@ -453,6 +453,8 @@ class RestService {
   /**
    * Publish a resource for a form definition.
    * New behaviour Orbeon Forms 4, never called in Orbeon 3.
+   * A resource is given a name by Orbeon: ${uuid}.bin
+   * It is unique in itself, so we omit the uuid of the form definition.
    * The url used in this op contains the draft version for which the Publish
    * action was invoked.
    * In the normal case the resource already exists and nothing needs to be done
@@ -465,7 +467,7 @@ class RestService {
     }
     def item = null
     item = PxdItem.findByPath(resource)
-    if (log.debugEnabled) log.debug "createPublishedResource.item ${item}"
+    if (log.debugEnabled) log.debug "createPublishedResource EXISTING ${item}"
 
     if (!item) {
       String formDef = "${appName}/${formName}"

@@ -8,9 +8,10 @@ import org.motrice.postxdb.XFormsLanguage
 
 @TestMixin(GrailsUnitTestMixin)
 class XFormsLanguageTests {
+  static final DATADIR = new File('datafortests')
 
   void testBasics() {
-    def formFile = new File('submarine-rescue-form.xhtml')
+    def formFile = new File(DATADIR, 'submarine-rescue-form.xhtml')
     // Create from existing form
     def converter = new XFormsLanguage(formFile.text)
     def langList = converter.currentLangSet as List

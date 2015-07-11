@@ -31,6 +31,8 @@ class BootStrap {
     XML.registerObjectMarshaller(new org.codehaus.groovy.grails.web.converters
    .marshaller.xml.InstanceMethodBasedMarshaller())
   }
+
   def destroy = {
   }
+
 }
