@@ -160,10 +160,10 @@ log4j = {
            'org.codehaus.groovy.grails.plugins',            // plugins
            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
            'org.springframework',
-           'org.hibernate',
-           'net.sf.ehcache.hibernate'
+           'net.sf.ehcache.hibernate',
+           'org.hibernate'
 
-    debug 'org.motrice.postxdb', 'grails.app.controllers', 'org.motrice.postxdb.RestService' , 'org.motrice.postxdb.PostxdbService', 'org.motrice.postxdb.ItemService'
+    error 'org.motrice.postxdb', 'grails.app.controllers', 'org.motrice.postxdb.RestService' , 'org.motrice.postxdb.PostxdbService', 'org.motrice.postxdb.ItemService'
 }
 
 // Timestamp format in responses to Orbeon

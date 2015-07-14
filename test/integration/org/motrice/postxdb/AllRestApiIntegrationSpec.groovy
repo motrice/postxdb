@@ -20,14 +20,22 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
   static final PHOTO_RESOURCE = 'c4fefeea7ee0b4747b7b5ef849cdbcaca981995c.bin'
   static final DRAFT_UUID = '999ffef3cbe94bf220d21ff82d217b454f19da2b'
   static final UNVERSIONED_FORMDEF = 'postxdb_test02--unversioned_form.xml'
+  static final FORM_DATA01_UUID = '84f600c2dfadee38f753bbb61182dfd0b96ade7a'
+  static final String FORM_DATA01_PATH = "${FORM_DATA01_UUID}_data.xml"
+  static final FORM_DATA02_UUID = '8aebb81fafd6c4fe844c69b93e786c1db7d45f0c'
+  static final String FORM_DATA02_PATH = "${FORM_DATA02_UUID}_data.xml"
+  static final FORM_DATA02_IMAGE = '000c3e61c6746c736403dd694c8c5d805e0d0439.bin'
+  static final APP_NAME = 'postxdb'
+  static final PUBLISHED_FORM_NAME = 'test02--v001'
 
   @Shared photoSize = 0
   @Shared draftSize = 0
   @Shared publishedSize = 0
+  @Shared customHeader = grailsConfig.postxdb.itempath.header
   @Shared formdefId = ''
   @Shared publishedVerId = ''
   @Shared itemList
-  @Shared customHeader = grailsConfig.postxdb.itempath.header
+  @Shared formDataUuid = ''
 
   //=========== FORM DEFINITION TESTS ===========
 
@@ -209,8 +217,8 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
     def rfc = new RestFormdefController()
 
   and: 'set request parameters'
-    rfc.params.app = 'postxdb'
-    rfc.params.form = 'test02'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
     rfc.params.resource = PHOTO_RESOURCE
     def photo = new File(DATADIR, PHOTO_RESOURCE).bytes
     // Request: org.codehaus.groovy.grails.plugins.testing.GrailsMockHttpServletRequest
@@ -229,8 +237,8 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
     def rfc = new RestFormdefController()
 
   and: 'set request parameters'
-    rfc.params.app = 'postxdb'
-    rfc.params.form = 'test02'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
     rfc.params.resource = 'form.xhtml'
     def text = readItemText('postxdb/test02--v001_02/form.xml')
     publishedSize = text?.size()
@@ -248,8 +256,8 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
     def rfc = new RestFormdefController()
 
   and: 'set request parameters'
-    rfc.params.app = 'postxdb'
-    rfc.params.form = 'test02--v001'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
     rfc.params.resource = 'form.xhtml'
 
   when: 'call getop'
@@ -303,7 +311,7 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
   }
 
   @Unroll
-  def 'Check that item #path has id #id '(String path, Integer id) {
+  def 'Check that item #path has format #format '(String path, String format) {
   given: 'a list of item maps from the previous test'
 
   when: 'search for a path'
@@ -311,15 +319,15 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
 
   then: 'search the item map for the given id'
     map != null
-    map.ref as Integer == id
+    map.format == format
 
   where:
-  path | id
-  'c4fefeea7ee0b4747b7b5ef849cdbcaca981995c.bin' | 1
-  'postxdb/test02--v001_01/form.xml' | 4
-  'postxdb/test02--v001_02/form.xml' | 6
-  'postxdb/test02--v001/form.xhtml' | 8
-  'postxdb/test02--v002_01/form.xml' | 9
+  path | format
+  'c4fefeea7ee0b4747b7b5ef849cdbcaca981995c.bin' | 'binary'
+  'postxdb/test02--v001_01/form.xml' | 'xml'
+  'postxdb/test02--v001_02/form.xml' | 'xml'
+  'postxdb/test02--v001/form.xhtml' | 'xml'
+  'postxdb/test02--v002_01/form.xml' | 'xml'
   }
 
   def 'Check that there are no definition items yet'() {
@@ -342,6 +350,159 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
 
   //=========== FORM DATA TESTS ===========
 
+  def 'Create and store a form instance. No attached image'() {
+  given: 'A form instance in DATADIR'
+    def rfc = new RestFormdataController()
+
+  and: 'set request parameters'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
+    rfc.params.uuid = FORM_DATA01_UUID
+    rfc.params.resource = 'data.xml'
+
+  when: 'call putop'
+    rfc.response.reset()
+    rfc.request.xml = new File(DATADIR, FORM_DATA01_PATH).text
+    rfc.putop()
+
+  then: 'check outcome'
+    rfc.response.status == 201
+  }
+
+  def 'Create an empty new item, pick up the uuid'() {
+  given: 'Nothing special'
+    def rfc = new RestFormdataController()
+
+  and: 'set request parameters'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
+    rfc.params.uuid = null
+    rfc.params.resource = null
+
+  when: 'call newop'
+    rfc.response.reset()
+    rfc.newop()
+    formDataUuid = rfc.response.text
+    println "FORM DATA UUID: ${formDataUuid}"
+
+  then: 'check outcome'
+    rfc.response.status == 201
+  }
+
+  def 'Store an image attachment for a later form instance'() {
+  given: 'The uuid created in the previous test'
+    def rfc = new RestFormdataController()
+
+  and: 'set request parameters'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
+    rfc.params.uuid = formDataUuid
+    rfc.params.resource = FORM_DATA02_IMAGE
+    def photo = new File(DATADIR, FORM_DATA02_IMAGE).bytes
+    // Second usage of this variable
+    photoSize = photo.size()
+    rfc.request.content = photo
+    rfc.request.format = 'binary'
+
+  when: 'call putop'
+    rfc.response.reset()
+    rfc.putop()
+
+  then: 'check outcome'
+    rfc.response.status == 201
+  }
+
+  /**
+   * Note that a different controller is tested as compared to the form definition
+   * photo in one of the first test cases.
+   */
+  def 'Check that we can retrieve the attachment stored in the previous test'() {
+  given: 'We have just stored an image'
+    def rfc = new RestFormdataController()
+
+  and: 'set request parameters'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
+    rfc.params.uuid = formDataUuid
+    rfc.params.resource = FORM_DATA02_IMAGE
+
+  when: 'call getop'
+    rfc.response.reset()
+    rfc.getop()
+
+  then: 'check that we got the photo'
+    rfc.response.status == 200
+    // See class org.springframework.mock.web.MockHttpServletResponse
+    rfc.response.contentAsByteArray?.size() == photoSize
+  }
+
+  def 'Create and store a form instance that attaches the previous image'() {
+  given: 'Form data XML is stored in DATADIR, the uuid is picked up from the previous test'
+    def rfc = new RestFormdataController()
+
+  and: 'set request parameters'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
+    rfc.params.uuid = formDataUuid
+    rfc.params.resource = 'data.xml'
+
+  when: 'call putop'
+    rfc.response.reset()
+    rfc.request.xml = new File(DATADIR, FORM_DATA02_PATH).text
+    rfc.request.format = 'xml'
+    rfc.putop()
+
+  then: 'check outcome'
+    rfc.response.status == 201
+  }
+
+  def 'Closer check of form instance 1 stored in previous test'() {
+  given: 'Two form instances have just been stored'
+    def rfc = new RestFormdataController()
+
+  and: 'set request parameters'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
+    rfc.params.uuid = FORM_DATA01_UUID
+    rfc.params.resource = 'data.xml'
+
+  when: 'call getop'
+    rfc.response.reset()
+    rfc.getop()
+    def xml = rfc.response.text
+
+  then: 'check that we got the photo'
+    rfc.response.status == 200
+    // Contains a reference to the photo included in the form definition
+    xml.indexOf(PHOTO_RESOURCE) >= 0
+    // Does not contain a reference to the attached image
+    xml.indexOf(FORM_DATA02_IMAGE) < 0
+  }
+
+  def 'Closer check of form instance 2 stored in previous test'() {
+  given: 'Two form instances have just been stored'
+    def rfc = new RestFormdataController()
+
+  and: 'set request parameters'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
+    rfc.params.uuid = formDataUuid
+    rfc.params.resource = 'data.xml'
+
+  when: 'call getop'
+    rfc.response.reset()
+    rfc.getop()
+    def xml = rfc.response.text
+    println "CHECK 2 TEXT: ${xml}"
+
+  then: 'check that we got the photo'
+    rfc.response.status == 200
+    // Contains a reference to the photo included in the form definition
+    xml.indexOf(PHOTO_RESOURCE) >= 0
+    // Does not contain a reference to the attached image
+    xml.indexOf(FORM_DATA02_IMAGE) >= 0
+  }
+
   //======= HELPER METHODS =======
 
   /**
@@ -351,6 +512,7 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
    */
   void checkSingleFormdef(String xml, String expectedCurrentDraft) {
     def list = convertFormdefOutput(xml)
+    println "FORM DEF LIST: ${list}"
     assert list.size() == 1
     def formdef = list[0]
     assert formdef.currentDraft == expectedCurrentDraft
