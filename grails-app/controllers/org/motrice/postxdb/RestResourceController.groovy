@@ -43,7 +43,6 @@ import org.springframework.dao.DataIntegrityViolationException
 class RestResourceController {
   // RestService injection
   def restService
-  def grailsApplication
 
   /**
    * Get a resource, XML or binary
@@ -96,8 +95,7 @@ class RestResourceController {
     }
 
     if (itemObj) {
-      def pathHeader = grailsApplication.config.postxdb.itempath.header
-      if (pathHeader) header(pathHeader, itemObj.path)
+      restService.addPathHeader(itemObj, response)
       // Too bad, but Orbeon chokes if we return anything, response must be empty.
       render(status: 201)
     } else {

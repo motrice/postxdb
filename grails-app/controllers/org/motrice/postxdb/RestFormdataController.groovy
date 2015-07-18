@@ -34,7 +34,6 @@ import org.motrice.postxdb.Util;
 class RestFormdataController {
   // RestService injection
   def restService
-  def grailsApplication
 
   private static final String STANDARD_QUERY_RESPONSE = '<exist:result xmlns:exist="http://exist.sourceforge.net/NS/exist" exist:hits="1" exist:start="1" exist:count="1"><data-exists>true</data-exists></exist:result>'
 
@@ -107,8 +106,7 @@ class RestFormdataController {
     if (status) {
       render(status: status)
     } else if (itemObj) {
-      def pathHeader = grailsApplication.config.postxdb.itempath.header
-      if (pathHeader) header(pathHeader, itemObj.path)
+      restService.addPathHeader(itemObj, response)
       // The response must be empty, or Orbeon chokes
       render(status: 201)
     } else {
@@ -133,8 +131,7 @@ class RestFormdataController {
     try {
       itemObj = restService.createEmptyInstanceItem(params.app, params.form)
       text = itemObj.uuid
-      def pathHeader = grailsApplication.config.postxdb.itempath.header
-      if (pathHeader) header(pathHeader, itemObj.path)
+      restService.addPathHeader(itemObj, response)
     } catch (PostxdbException exc) {
       status = exc.http
       text = "${exc.code}|${message(code: exc.code)}"

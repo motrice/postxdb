@@ -59,4 +59,8 @@ beans = {
   // Our JMX management bean
   basicJmxManagement(BasicAppManagement)
 
+  callbackManager(org.motrice.postxdb.CallbackManager) {
+    grailsApplication = ref('grailsApplication')
+  }
+
 }

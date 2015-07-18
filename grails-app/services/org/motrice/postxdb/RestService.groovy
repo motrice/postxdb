@@ -49,6 +49,10 @@ import org.motrice.postxdb.MetaExtractor;
  * version number.
  */
 class RestService {
+  // Config access
+  def grailsApplication
+  def callbackManager
+
   private static final log = LogFactory.getLog(this)
 
   private static final XML_PROLOG = '<?xml version="1.0" encoding="UTF-8"?>'
@@ -82,6 +86,17 @@ class RestService {
     def tgtItem = createDraftItem(form.formdef.uuid, 'form.xml', tgtXml)
     if (log.debugEnabled) log.debug "addLanguage >> ${tgtItem} ${result}"
     return result
+  }
+
+  /**
+   * Add a custom header to the response, if configured.
+   */
+  def addPathHeader(PxdItem item, response) {
+    def pathHeader = grailsApplication.config.postxdb.itempath.header
+    if (pathHeader && item) {
+      response.addHeader(pathHeader, item.path)
+      if (log.debugEnabled) log.debug "addPathHeader '${item.path}'"
+    }
   }
 
   /**
@@ -213,6 +228,7 @@ class RestService {
     editor.edit()
     item.assignText(editor.formdefOut)
     if (!item.save()) log.error "Item save: ${item.errors.allErrors.join(',')}"
+    callbackManager.draftFormdefItem(formdef, formdefVer, item)
     return item
   }
 
@@ -342,7 +358,7 @@ class RestService {
     meta = editor.metadata
 
     // Create a form definition version for the new item
-    doCreateFormdefVer(formdef, publishedPath, meta)
+    def publishedFormdefVer = doCreateFormdefVer(formdef, publishedPath, meta)
 
     // Create the published item
     def publishedItem = doCreatePublishedItem(formdef, publishedPath, editor)
@@ -377,6 +393,7 @@ class RestService {
     // Create a new form definition version for the new current draft
     doCreateFormdefVer(formdef, currentDraftVersion, meta)
 
+    callbackManager.publishedFormdefItem(formdef, publishedFormdefVer, publishedItem)
     return publishedItem
   }
 
@@ -504,6 +521,7 @@ class RestService {
     // If the item was created now or existed previously, update the xml
     item.assignText(xml)
     if (!item.save()) log.error "createInstanceItem save: ${item.errors.allErrors.join(',')}"
+    callbackManager.instanceItem(item)
     if (log.debugEnabled) log.debug "createInstanceItem >> ${item}"
     return item
   }
@@ -533,6 +551,7 @@ class RestService {
     def bigInt = new java.math.BigInteger(160, new java.security.SecureRandom())
     def uuid = bigInt.toString(16).padLeft(20, '0')
     def item = createInstanceItem(appName, formName, uuid, 'data.xml', '')
+    callbackManager.instanceItem(item)
     if (log.debugEnabled) log.debug "createEmptyInstanceItem >> ${item}"
     return item
   }

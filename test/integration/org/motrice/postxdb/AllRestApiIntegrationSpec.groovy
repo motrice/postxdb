@@ -55,6 +55,7 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
 
   then: 'check outcome'
     rrc.response.status == 201
+    rrc.response.getHeader(customHeader) == PHOTO_RESOURCE
   }
 
   def 'Check that we can retrieve the photo stored in the previous test'() {
@@ -91,10 +92,12 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
     rrc.request.xml = text
 
   when: 'call putop'
+    rrc.response.reset()
     rrc.putop()
 
   then: 'check outcome'
-    rrc.response.status == 200
+    rrc.response.status == 201
+    rrc.response.getHeader(customHeader) == 'postxdb/test02--v001_01/form.xml'
   }
 
   /**
@@ -170,6 +173,7 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
 
   then: 'check outcome'
     rrc.response.status == 201
+    rrc.response.getHeader(customHeader) == 'postxdb/test02--v001_02/form.xml'
   }
 
   def 'Check that we have two form definition versions'() {
@@ -226,10 +230,12 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
     rfc.request.content = photo
 
   when: 'call putop'
+    rfc.response.reset()
     rfc.putop()
 
   then: 'check outcome'
-    rfc.response.status == 200
+    rfc.response.status == 201
+    rfc.response.getHeader(customHeader) == PHOTO_RESOURCE
   }
 
   def 'Second step of publishing the form def: Store the XML from the latest draft'() {
@@ -245,10 +251,12 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
     rfc.request.xml = text
 
   when: 'call putop'
+    rfc.response.reset()
     rfc.putop()
 
   then: 'check outcome'
-    rfc.response.status == 200
+    rfc.response.status == 201
+    rfc.response.getHeader(customHeader) == 'postxdb/test02--v001/form.xhtml'
   }
 
   def 'Check that we can retrieve the published form definition'() {
@@ -367,6 +375,7 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
 
   then: 'check outcome'
     rfc.response.status == 201
+    rfc.response.getHeader(customHeader) == '84f600c2dfadee38f753bbb61182dfd0b96ade7a/data.xml'
   }
 
   def 'Create an empty new item, pick up the uuid'() {
@@ -387,6 +396,7 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
 
   then: 'check outcome'
     rfc.response.status == 201
+    rfc.response.getHeader(customHeader) == "${formDataUuid}/data.xml"
   }
 
   def 'Store an image attachment for a later form instance'() {
@@ -410,6 +420,7 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
 
   then: 'check outcome'
     rfc.response.status == 201
+    rfc.response.getHeader(customHeader) == FORM_DATA02_IMAGE
   }
 
   /**
@@ -454,6 +465,7 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
 
   then: 'check outcome'
     rfc.response.status == 201
+    rfc.response.getHeader(customHeader) == "${formDataUuid}/data.xml"
   }
 
   def 'Closer check of form instance 1 stored in previous test'() {
