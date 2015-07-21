@@ -521,7 +521,7 @@ class RestService {
     // If the item was created now or existed previously, update the xml
     item.assignText(xml)
     if (!item.save()) log.error "createInstanceItem save: ${item.errors.allErrors.join(',')}"
-    callbackManager.instanceItem(item)
+    callbackManager.saveInstanceItem(item)
     if (log.debugEnabled) log.debug "createInstanceItem >> ${item}"
     return item
   }
@@ -551,7 +551,7 @@ class RestService {
     def bigInt = new java.math.BigInteger(160, new java.security.SecureRandom())
     def uuid = bigInt.toString(16).padLeft(20, '0')
     def item = createInstanceItem(appName, formName, uuid, 'data.xml', '')
-    callbackManager.instanceItem(item)
+    callbackManager.emptyInstanceItem(item)
     if (log.debugEnabled) log.debug "createEmptyInstanceItem >> ${item}"
     return item
   }

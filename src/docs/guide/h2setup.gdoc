@@ -1,0 +1,19 @@
+The [H2 database engine|http://www.h2database.com/html/main.html] is included with Postxdb.
+Set it up by including the following entries in the Postxdb configuration.
+{code}
+dataSource.url = jdbc:h2:work/postxdb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+dataSource.driverClassName = org.h2.Driver
+dataSource.username = sa
+dataSource.password = 
+dataSource.dbCreate = update
+{code}
+
+This particular configuration runs an in-process database.
+It needs no external database server, quite convenient for demos.
+The database is persisted in a directory named @work@ relative to the servlet container root.
+Database file names will begin with @postxdb@.
+Make sure the servlet container has write access to this directory.
+The database is created automatically when you start up Postxdb.
+
+H2 is a versatile solution with many options that you may want to explore further.
+In general, H2 is recommended for limited demos and tests, not for production.

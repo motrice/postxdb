@@ -1,0 +1,70 @@
+We assume that PostgreSQL is installed on your system and that
+you have at least some experience with managing [PostgreSQL|http://www.postgresql.org/].
+
+Unless you want Postxdb to use an existing database, create a database and a user/role that owns it.
+You will need superuser access.
+The following simple example creates a database user called @orbeonuser@ and a database named @orbeondb@.
+You may freely change these names and obviously set your own password for the database user.
+(@postgres@ is by convention the OS user with PostgreSQL full admin privileges.)
+{code}
+sudo su - postgres
+postgres@host:~$ psql
+postgres=# create role orbeonuser login password 'howdy!howdy';
+postgres=# create database orbeondb encoding 'UTF8' owner orbeonuser;
+postgres=# \q
+{code}
+
+Test access using the new username and database with the following command (you don't have to be @postgres@ in this case):
+{code}
+postgres@host:~$ psql -U orbeonuser orbeondb
+{code}
+
+If you get an error message you must edit a PostgreSQL configuration file.
+In this case you need superuser access.
+The file to edit is @/etc/postgresql/${version}/${cluster}/pg_hba.conf@ where @${version}@ stands
+for the PostgreSQL version (like @9.3@) and @${cluster}@ stands for a cluster name (like @main@).
+The @pg_hba.conf@ file defines how PostgreSQL authenticates clients.
+An entire chapter is dedicated to this topic in the PostgreSQL reference.
+For the purposes of this description we offer two simple alternatives.
+
+The first sample @pg_hba.conf@ is a lazy configuration.
+It allows all database users to access all databases given username and password.
+{code}
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+# "local" is for Unix domain socket connections only
+local   all             all                                    md5
+# IPv4 local connections:
+host    all             all            127.0.0.1/32            md5
+# IPv6 local connections:
+host    all             all            ::1/128                 md5
+{code}
+
+The above configuration may be adequate for an experimental box where you often create users and databases.
+A production system would demand a per-database list of users.
+In our simple case it could look like this.
+{code}
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+# "local" is for Unix domain socket connections only
+local   orbeondb        orbeonuser                              md5
+# IPv4 local connections:
+host    orbeondb        orbeonuser            127.0.0.1/32      md5
+# IPv6 local connections:
+host    orbeondb        orbeonuser            ::1/128           md5
+{code}
+
+A JDBC driver for [PostgreSQL|http://www.postgresql.org/] is included with Postxdb.
+All you have to do is include the following lines in the Postxdb configuration file.
+{code}
+dataSource.driverClassName = org.postgresql.Driver
+dataSource.username = orbeonuser
+dataSource.password = howdy!howdy
+dataSource.url = jdbc:postgresql://localhost:5432/orbeondb
+dataSource.dbCreate = update
+{code}
+
+Replace username, password and database name as needed.
+The number @5432@ is the default PostgreSQL port number.
+Change if needed.
+
+PostgreSQL is a fully featured database systems.
+This short description just scratches the surface of available configuration options.

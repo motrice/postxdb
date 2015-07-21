@@ -1,0 +1,12 @@
+In general, database setup is done in these steps,
+
+* Download and install a JDBC driver
+* Create a database
+* Add datasource entries to the Postxdb configuration file
+
+Postxdb comes equipped with the H2 database and with PostgreSQL connectivity.
+No driver has to be downloaded for them.
+
+Postxdb creates and uses only three tables. Their names are prefixed by @pxd_@
+
+Pick the subsection that corresponds to the database engine of your choice.

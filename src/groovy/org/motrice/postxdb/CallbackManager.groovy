@@ -61,7 +61,7 @@ class CallbackManager {
    */
   def draftFormdefItem(PxdFormdef formdef, PxdFormdefVer formdefVer, PxdItem item) {
     if (threadPool) {
-      doCallback(formdef, formdefVer, item, false, false)
+      doCallback('draftFormdefItem', formdef, formdefVer, item, false, false)
     }
   }
 
@@ -70,23 +70,32 @@ class CallbackManager {
    */
   def publishedFormdefItem(PxdFormdef formdef, PxdFormdefVer formdefVer, PxdItem item) {
     if (threadPool) {
-      doCallback(formdef, formdefVer, item, false, true)
+      doCallback('publishedFormdefItem', formdef, formdefVer, item, false, true)
     }
   }
 
   /**
    * Callback indicating saving a form instance item.
    */
-  def instanceItem(PxdItem item) {
+  def saveInstanceItem(PxdItem item) {
     if (threadPool) {
-      doCallback(null, null, item, true, false)
+      doCallback('saveInstanceItem', null, null, item, true, false)
     }
   }
 
-  private doCallback(PxdFormdef formdef, PxdFormdefVer formdefVer, PxdItem item,
+  /**
+   * Callback indicating creating an empty form instance item.
+   */
+  def emptyInstanceItem(PxdItem item) {
+    if (threadPool) {
+      doCallback('emptyInstanceItem', null, null, item, true, false)
+    }
+  }
+
+  private doCallback(String op, PxdFormdef formdef, PxdFormdefVer formdefVer, PxdItem item,
 		     boolean instance, boolean published)
   {
-    def message = "{\"formdefId\":${formdef?.id},\"formdefVerId\":${formdefVer?.id},\"itemId\":${item?.id},\"instance\":${instance},\"published\":${published}}|||"
+    def message = "{\"op\":${op},\"formdefId\":${formdef?.id},\"formdefVerId\":${formdefVer?.id},\"itemId\":${item?.id},\"instance\":${instance},\"published\":${published}}|||"
     def job = new CallbackJob(socket, tgtPortNumber, message)
     if (log.debugEnabled) log.debug "callback << '${message}' on port ${tgtPortNumber}"
     threadPool.submit(job)

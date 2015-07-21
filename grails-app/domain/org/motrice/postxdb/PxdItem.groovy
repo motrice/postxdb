@@ -122,6 +122,7 @@ class PxdItem {
   byte[] stream
 
   static mapping = {
+    sort lastUpdated: 'desc'
     text type: 'text'
     uuid index: 'Uuid_Idx'
     formDef index: 'Formdef_Idx'

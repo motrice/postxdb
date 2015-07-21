@@ -79,6 +79,9 @@ class PxdFormdef implements Comparable {
   SortedSet forms
   static hasMany = [forms: PxdFormdefVer]
 
+  static mapping = {
+    sort 'path'
+  }
   static constraints = {
     path size: 3..256, unique: true
     uuid maxSize: 200, unique: true

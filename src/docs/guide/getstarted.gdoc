@@ -1,0 +1,14 @@
+Here are the main steps for getting started with Postxdb.
+The details follow below.
+
+We assume you already run Orbeon in a servlet container.
+If you don't you will have to install and set up Orbeon first.
+
+1. Set up a database (or use the built-in H2 database)
+1. Set up your favorite servlet container (or use the container where Orbeon runs)
+1. Configure Postxdb and Orbeon (see [Configuration|guide:configuration])
+
+After these steps you are ready to run Orbeon with Postxdb persistence to your favorite database.
+
+There are many variations to this theme, of course.
+We expect subsections for various use cases to be added over time.

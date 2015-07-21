@@ -25,6 +25,7 @@ import grails.converters.*
 
 class BootStrap {
   def callbackManager
+  def grailsApplication
 
   def init = {servletContext ->
     // This call makes Grails look for a toXml method in the domain
@@ -34,6 +35,9 @@ class BootStrap {
 
     // Start the callback manager
     callbackManager.startup()
+
+    // Print the datasource url
+    println "*** Datasource: ${grailsApplication.config.dataSource.url} ***"
   }
 
   def destroy = {
