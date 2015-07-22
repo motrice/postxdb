@@ -1,0 +1,9 @@
+You may configure Postxdb to send notifications of storage events.
+This is especially relevant for Form Builder.
+It is difficult to know or control programmatically what a user does in Form Builder.
+Form Runner, on the other hand, is more flexible when it comes to button configuration.
+
+A Postxdb notification consists of a UDP packet containing a JSON array,
+equivalent to a Java/Groovy Map.
+Postxdb notifications are asynchronous, meaning that they don't block the operation they are part of.
+No response is expected, configuring notifications and then not listening for them does not break anything.
