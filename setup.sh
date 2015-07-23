@@ -12,6 +12,8 @@ export GRAILS_HOME=/usr/local/grails-2.4.5
 #export POSTXDB_CONF=/usr/local/etc/motrice/motrice-aug14-config.properties
 #export MOTRICE_CONF=/usr/local/etc/motrice/motrice-test-sep14-config.properties
 export POSTXDB_CONF=/usr/local/etc/skolverket/skoolform-config.properties
+#export POSTXDB_CONF=/usr/local/etc/skolverket/skol02-config.properties
+#export POSTXDB_CONF=/usr/local/etc/skolverket/orbeon-mysql.properties
 export M2_HOME=/usr/local/apache-maven-3.2.5
 
 alias grails="$GRAILS_HOME/bin/grails -plain-output"

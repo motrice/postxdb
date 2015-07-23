@@ -1,15 +1,22 @@
 Postxdb has been thoroughly tested with the Apache Tomcat servlet container.
 Other servlet containers may be added to this description over time.
 
-The Postxdb war file is named @exist.war@ in order to retain compatibility with eXist-db.
+As distributed, the Postxdb war file is named @exist-n.n.n.war@ where @n.n.n@ is the version number.
+The name refers to the eXist-db database whose interface Postxdb emulates.
 
 An easy way is to use the servlet container where Orbeon is already running.
-You may have to increase its memory allocation.
 
 h4. Apache Tomcat
 
-Drop @exist.war@ in the Tomcat @webapps@ directory.
+Rename the Postxdb war file (@exist-n.n.n.war@) to @exist.war@ without any version number.
+Drop it into the Tomcat @webapps@ directory.
 
-You may need to set an environment variable pointing to the Postxdb configuration file.
+Unless you use the default H2 database configuration you will need
+to set an environment variable that points to the Postxdb configuration file.
 Conventionally this is done in a file named @bin/setenv.sh@ (@setenv.bat@ on Windows).
-Further details in [Configuration|guide:configuration].
+You will find configuration details in [Configuration|guide:configuration].
+
+Start Tomcat.
+
+On startup Postxdb will print a few messages to the log.
+Check them to find out what configuration file and datasource it uses.

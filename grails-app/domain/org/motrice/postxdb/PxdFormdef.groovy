@@ -83,7 +83,7 @@ class PxdFormdef implements Comparable {
     sort 'path'
   }
   static constraints = {
-    path size: 3..256, unique: true
+    path size: 3..255, unique: true
     uuid maxSize: 200, unique: true
     appName size: 1..120
     formName size: 1..120

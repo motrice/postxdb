@@ -1,18 +1,22 @@
 intro:
   title: Postxdb Intro
+fasttrack:
+  title: The Fast Track
 getstarted:
-  title: Getting Started
+  title: Installation
   databasesetup:
     title: Set Up The Database
     h2setup:
       title: H2 On Any Platform
     pgsetup:
       title: PostgreSQL On Linux
+    mysqlsetup:
+      title: Sorry, No MySQL
   servletcontainersetup:
     title: Set Up the Servlet Container
 configuration:
   title: Configuration
 features:
-  title: Feature Reference
+  title: Reference
   notifications:
     title: Storage Notifications

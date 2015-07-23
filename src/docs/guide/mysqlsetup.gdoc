@@ -1,0 +1,3 @@
+We are sorry to say that Postxdb currently does not support [MySQL|https://www.mysql.com/].
+MySQL regards any string longer than 255 characters as a special case, especially when defining indexes.
+Currently we don't have the resources to work around this limitation that other databases don't have.

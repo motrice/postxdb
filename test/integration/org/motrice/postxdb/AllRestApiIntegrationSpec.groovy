@@ -25,6 +25,7 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
   static final FORM_DATA02_UUID = '8aebb81fafd6c4fe844c69b93e786c1db7d45f0c'
   static final String FORM_DATA02_PATH = "${FORM_DATA02_UUID}_data.xml"
   static final FORM_DATA02_IMAGE = '000c3e61c6746c736403dd694c8c5d805e0d0439.bin'
+  static final FORM_DATA03_UUID = '2b38370625bffb24425c2571ca099c0d40eb8acf'
   static final APP_NAME = 'postxdb'
   static final PUBLISHED_FORM_NAME = 'test02--v001'
 
@@ -392,7 +393,6 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
     rfc.response.reset()
     rfc.newop()
     formDataUuid = rfc.response.text
-    println "FORM DATA UUID: ${formDataUuid}"
 
   then: 'check outcome'
     rfc.response.status == 201
@@ -505,7 +505,6 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
     rfc.response.reset()
     rfc.getop()
     def xml = rfc.response.text
-    println "CHECK 2 TEXT: ${xml}"
 
   then: 'check that we got the photo'
     rfc.response.status == 200
@@ -513,6 +512,52 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
     xml.indexOf(PHOTO_RESOURCE) >= 0
     // Does not contain a reference to the attached image
     xml.indexOf(FORM_DATA02_IMAGE) >= 0
+  }
+
+  def 'Duplicate instance 2 stored above. Make the original read-only.'() {
+  given: 'A previous test found the id of the published form def version'
+    def rpc = new RestPostxdbController()
+
+  and: 'set request parameters'
+    rpc.params.app = null
+    rpc.params.form = null
+    rpc.params.uuid = null
+    rpc.params.resource = null
+    rpc.params.srcuuid = formDataUuid
+    rpc.params.tgtuuid = FORM_DATA03_UUID
+
+  when: 'call duplicateinstance'
+    rpc.response.reset()
+    rpc.duplicateinstance(null)
+    def xml = rpc.response.text
+    def map = convertDuplicateitemOutput(xml)
+
+  then: 'check the response'
+    rpc.response.status == 200
+    map.uuid == FORM_DATA03_UUID
+    map.formpath == "${APP_NAME}/${PUBLISHED_FORM_NAME}"
+    // Check that the duplicate points back to the original
+    readItemUuid(map.origin) == formDataUuid
+  }
+
+  def 'Check that we cannot write to the instance duplicated in the previous test'() {
+  given: 'Reuse the original data, it should not matter'
+    def rfc = new RestFormdataController()
+
+  and: 'set request parameters'
+    rfc.params.app = APP_NAME
+    rfc.params.form = PUBLISHED_FORM_NAME
+    rfc.params.uuid = formDataUuid
+    rfc.params.resource = 'data.xml'
+
+  when: 'call putop'
+    rfc.response.reset()
+    rfc.request.xml = new File(DATADIR, FORM_DATA02_PATH).text
+    rfc.request.format = 'xml'
+    rfc.putop()
+
+  then: 'check outcome'
+    rfc.response.status == 403
   }
 
   //======= HELPER METHODS =======
@@ -524,7 +569,6 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
    */
   void checkSingleFormdef(String xml, String expectedCurrentDraft) {
     def list = convertFormdefOutput(xml)
-    println "FORM DEF LIST: ${list}"
     assert list.size() == 1
     def formdef = list[0]
     assert formdef.currentDraft == expectedCurrentDraft
@@ -617,6 +661,25 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
   }
 
   /**
+   * Convert the output of the duplicateitem REST API to Map.
+   */
+  private Map convertDuplicateitemOutput(String xml) {
+    def result = []
+    def list = new XmlSlurper().parseText(xml)
+    list.pxdItem.each {item ->
+      def entry = [:]
+      item.'*'.each {node ->
+	entry[node.name()] = node.text()
+      }
+
+      result.add(entry)
+    }
+
+    assert result.size() == 1
+    return result[0]
+  }
+
+  /**
    * Return the text of an item specified by a path.
    * There is an encoding problem when using the REST API to get item text.
    * It seems to be inherent in the test environment, not in actual use.
@@ -624,6 +687,14 @@ class AllRestApiIntegrationSpec extends IntegrationSpec {
   private String readItemText(String itemPath) {
     def item = PxdItem.findByPath(itemPath)
     return item? item.text : null
+  }
+
+  /**
+   * Retrieve an item by id, return its uuid.
+   */
+  private String readItemUuid(id) {
+    def item = PxdItem.get(id)
+    return item?.uuid
   }
 
 }

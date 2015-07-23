@@ -56,7 +56,12 @@ String generateConfigDefaultPath() {
     println "--- Postxdb CONFIG: Environment specified ${CONFENV2}"
     FILENAME = CONFENV2
   } else {
-    println "--- Postxdb CONFIG: Default ${FILENAME}"
+    def defaultFile = new File(FILENAME)
+    if (defaultFile?.canRead()) {
+      println "--- Postxdb CONFIG: Default ${FILENAME}"
+    } else {
+      println "--- Postxdb CONFIG: No config file available. Using the built-in H2 database."
+    }
   }
 
   return FILENAME

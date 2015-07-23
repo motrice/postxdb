@@ -39,6 +39,8 @@ class PxdItem {
   static public String FORMDEF_PUBLISHED_SUFFIX = 'form.xhtml'
   // Draft form definition suffix
   static public String FORMDEF_DRAFT_SUFFIX = 'form.xml'
+  // Max text or stream length
+  static final Integer MAX_PAYLOAD_SIZE = 20 * 1000 * 1024
 
   // Injection magic
   def grailsApplication
@@ -111,19 +113,22 @@ class PxdItem {
   private Long formref
 
   /**
-   * Content is either text or binary
-   * Text content
+   * Content is either text or binary.
+   * Text content.
+   * Size constraint to make the database schema more portable.
    */
   String text
 
   /**
-   * Binary content (PostgreSQL bytea limited to 1 GB)
+   * Binary content.
+   * Size constraint to make the database schema more portable.
    */
   byte[] stream
 
   static mapping = {
     sort lastUpdated: 'desc'
     text type: 'text'
+    stream type: 'binary'
     uuid index: 'Uuid_Idx'
     formDef index: 'Formdef_Idx'
   }
@@ -138,8 +143,8 @@ class PxdItem {
     lastUpdated nullable: true
     format nullable: false, maxSize: 80
     size range: 0..Integer.MAX_VALUE-1
-    text nullable: true
-    stream nullable: true
+    text nullable: true, maxSize: MAX_PAYLOAD_SIZE
+    stream nullable: true, maxSize: MAX_PAYLOAD_SIZE
   }
 
   /**
