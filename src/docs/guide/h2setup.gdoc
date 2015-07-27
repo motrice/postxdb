@@ -13,7 +13,8 @@ It needs no external database server, quite convenient for demos.
 The database is persisted in a directory named @work@ relative to the servlet container root.
 Database file names will begin with @postxdb@.
 Make sure the servlet container has write access to this directory.
-The database is created automatically when you start up Postxdb.
+
+You don't have to create the database. It is created automatically when you start up Postxdb.
 
 H2 is a versatile solution with many options that you may want to explore further.
 In general, H2 is recommended for limited demos and tests, not for production.

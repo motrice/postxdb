@@ -1,0 +1,162 @@
+h2. List Editable Forms
+
+List editable forms. Only the current draft of a form is editable. Paged output.
+{code}
+GET $PREFIX/orbeon/builder/data
+{code}
+
+Optional parameters:
+* *page-size*: Max number of forms per page. Default: 15.
+* *page-number*: Page number where the first page is 1. Default: 1.
+
+The body may contain a search query.
+Postxdb has limited support for form searches.
+It only supports the search that appears after you click _Show search options_. 
+
+*Returns* an XML document containing a list of forms on the format required by Orbeon.
+The list may be empty. An example follows.
+{code:xml}
+<exist:result xmlns:exist='http://exist.sourceforge.net/NS/exist' exist:hits='1' exist:start='1' exist:count='1'>
+  <documents total='26' search-total='26' page-size='15' page-number='1' query=''>
+    <document created='2013-10-03T10:12:00.175' last-modified='2013-10-03T10:12:00.175' draft='false' name='d7e132a0b8fadbfde372f8c1660e0bd2'>
+      <details>
+        <detail>anonymous</detail>
+        <detail>authsubmit--v003_01</detail>
+        <detail>Anonym till skicka in</detail>
+        <detail>--</detail>
+      </details>
+    </document>
+    <document created='2013-12-27T20:58:24.620' last-modified='2013-12-27T20:58:24.620' draft='false' name='623d3487dfd6776aeb148d41edcfb3d60beef344'>
+      <details>
+        <detail>bells</detail>
+        <detail>whistles--v011_02</detail>
+        <detail>Orbeon Bells &amp; Whistles</detail>
+        <detail>Test case using most of Orbeon controls.</detail>
+      </details>
+    </document>
+  </documents>
+</exist:result>
+{code}
+
+h2. Save a Draft Form Resource
+
+Store an XML draft form definition, or a resource belonging to a draft form definition.
+An attached image is a common example of a (binary) resource.
+
+Every form definition (defined by app name/form name) is assigned a uuid by Orbeon.
+Repeated saves must save to the same uuid.
+
+{code}
+PUT $PREFIX/orbeon/builder/data/$uuid/$resource
+BODY: The resource, draft form XML, or an arbitrary resource
+{code}
+
+*Returns* 201 on success, 409 on failure, and a plain text message.
+The message contains the exception message on failure.
+
+h4. XML
+
+Form metadata (app name, form name, etc) is extracted from the draft form.
+A version and draft number is appended to the form name if it does not have one.
+Otherwise the draft number is incremented.
+The XML is updated to reflect the new version number.
+
+A @pxd_formdef@ record is created if this is the first draft of this form.
+A @pxd_formdef_ver@ record is created for the new draft.
+The resulting XML is stored in @pxd_item@ with the uuid and the form name.
+The path column will contain @app/form\--vNNN_NN/form.xml@
+
+Assume the original form name is @app/form\--v001_05@. Then after being saved this is a summary of database contents.
+
+* @pxd_item@ contains the XML where @app/form\--v001_06@ has been inserted
+* @pxd_formdef_ver@ has an entry for @app/form\--v001_06@
+* @pxd_formdef@ is updated to point to the new draft as the current draft
+
+h4. Other Resources
+
+Resource are usually uploaded to Orbeon from a file.
+The original file name is kept in the form definition but Orbeon identifies the resource as @{uuid}.bin@.
+The uuid uniquely identifies the resource.
+Postxdb saves resources in @pxd_item@ using the resource name as path.
+
+Before Orbeon 4.3 the file name extension was kept from the original.
+
+Postxdb drops the uuid contained in the URL.
+The reason is that the resource name contains another uuid which is sufficient to identify the resource.
+
+h2. Retrieve a Draft Form Resource
+
+Retrieve an XML draft form definition, or a resource belonging to a draft form definition.
+If the resource name begins with @data@ it is considered XML (i.e. a form definition).
+Orbeon does not know about Postxdb drafts, so the uuid is used to look up a form in @pxd_formdef@.
+A @pxd_formdef@ has a pointer to the current draft which is retrieved from @pxd_item@ using the path.
+
+{code}
+GET $PREFIX/orbeon/builder/data/$uuid/$resource
+{code}
+
+*Returns* 200 and the resource, or 404 depending on the outcome.
+The @Content-Type@ is either @application/xml;charset=UTF-8@ (for XML resources) or @application/octet-stream@ (for attachments).
+
+h2. Store a Published Form Definition
+
+Store an XML published form definition, or a resource belonging to a published form definition.
+The @Content-Type@ is used to distinguish between the XML form definition and other resources.
+
+{code}
+PUT $PREFIX/$app/$form/form/$resource
+BODY: The resource, XML or an arbitrary resource
+{code}
+
+where @$app@ is the Orbeon app name, @$form@ is the Orbeon form name (including the version number inserted by Postxdb).
+
+*Returns* 201 on success, 409 on failure, and a plain text message.
+The message contains the exception message on failure.
+
+h4. XML
+
+At least one draft must exist before you may publish.
+
+The version of the published XML is relative to the current draft.
+The version stored in the XML string.
+
+For example, assume the current draft is @app/form\--v001_06@.
+Then after the operation the database contains two items.
+
+* The published form: @app/form\--v001@, a copy (except for the version number) of the XML sent to the operation
+* The new current draft: @app/form\--v002_01@, a copy (except for the version number) of @app/form\--v001_06@
+
+Thus the new current draft is not a copy of the published version.
+
+The @pxd_formdef@ and @pxd_formdef_ver@ tables are updated to reflect the new items.
+The form XML is updated with the new form names containing version numbers.
+Published form XML is stored in @pxd_item@ with the path @app/form\--v001/form.xhtml@.
+
+h4. Other Resources
+
+Orbeon pre-4.3 left resources in their draft collection.
+As from 4.3 Orbeon actively stores them again using this operation.
+The resource name is the same as for draft resources.
+This means that the resource name in itself uniquely identifies the resource.
+
+Postxdb checks if the resource is already present in the database.
+In most cases it is, and postxdb does nothing.
+If not present, Postxdb stores the resource in @pxd_item@ under its uuid.
+
+h2. Retrieve a Published Form Definition
+
+Retrieve an XML published form definition, or a resource belonging to a published form definition.
+If the resource name is @form.xhtml@ the XML form definition is retrieved.
+
+{code}
+GET $PREFIX/$app/$form/form/$resource
+{code}
+
+where @$app@ is the Orbeon app name, @$form@ is the Orbeon form name (including the version number inserted by Postxdb).
+
+*Returns* 200 and the resource, or 404 depending on the outcome.
+The @Content-Type@ is either @application/xml;charset=UTF-8@ or @application/octet-stream@.
+
+The @library@ form name is magic.
+Orbeon reserves this name for reusable sections.
+When retrieved the API returns the latest published version regardless of the version in the request.

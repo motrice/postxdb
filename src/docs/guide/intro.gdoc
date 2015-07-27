@@ -5,7 +5,7 @@ In terms of functionality significant features have been added to aid Orbeon int
 
 Postxdb needs a servlet container (like, for instance, [Apache Tomcat|http://tomcat.apache.org/])
 and a SQL database.
-Postxdb has been tested extensively with Tomcat and the [PostgreSQL database|http://www.postgresql.org/].
+Postxdb has been tested extensively with Apache Tomcat and the [PostgreSQL database|http://www.postgresql.org/].
 However, Postxdb relies on [Hibernate|http://hibernate.org/] for its database transactions
 and Hibernate works with most relational databases, and then some.
 There is great potential for adapting to other database systems.
@@ -27,8 +27,8 @@ Other applications may interface the database directly or through REST services.
 
 Several useful REST services have been added, for instance,
 
-* Write-protect a form instance (conditionally duplicating it to a new, writable instance)
 * Add languages to a form definition
+* Write-protect a form instance (conditionally duplicating it to a new, writable instance)
 * Create a form instance from data in a JSON array
 
 Other noteworthy features are,
@@ -43,7 +43,7 @@ Orbeon has no idea it is talking to a different persistence backend.
 
 Postxdb connects to its database through Hibernate.
 Changing the underlying database may be as simple as providing another JDBC driver
-and modifying the Postxdb configuration.
+and changing a few lines in the Postxdb configuration file.
 
 Postxdb is built on the [Grails|https://grails.org/] web application framework.
 Grails is Open Source under the Apache 2 license.

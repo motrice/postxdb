@@ -5,7 +5,7 @@ Unless you want Postxdb to use an existing database, create a database and a use
 You will need superuser access.
 The following simple example creates a database user called @orbeonuser@ and a database named @orbeondb@.
 You may freely change these names and obviously set your own password for the database user.
-(@postgres@ is by convention the OS user with PostgreSQL full admin privileges.)
+(By convention, @postgres@ is the OS user with PostgreSQL full admin privileges.)
 {code}
 sudo su - postgres
 postgres@host:~$ psql
@@ -14,15 +14,18 @@ postgres=# create database orbeondb encoding 'UTF8' owner orbeonuser;
 postgres=# \q
 {code}
 
-Test access using the new username and database with the following command (you don't have to be @postgres@ in this case):
+Test access using the new username and database with the following command.
+You don't have to be @postgres@ in this case, but you need the password.
 {code}
 postgres@host:~$ psql -U orbeonuser orbeondb
 {code}
 
-If you get an error message you must edit a PostgreSQL configuration file.
+If you get an error message in spite of entering the correct password you must edit a PostgreSQL configuration file.
 In this case you need superuser access.
 The file to edit is @/etc/postgresql/${version}/${cluster}/pg_hba.conf@ where @${version}@ stands
 for the PostgreSQL version (like @9.3@) and @${cluster}@ stands for a cluster name (like @main@).
+(Details of file names may vary between *nix distributions.)
+
 The @pg_hba.conf@ file defines how PostgreSQL authenticates clients.
 An entire chapter is dedicated to this topic in the PostgreSQL reference.
 For the purposes of this description we offer two simple alternatives.
@@ -53,7 +56,7 @@ host    orbeondb        orbeonuser            ::1/128           md5
 {code}
 
 A JDBC driver for [PostgreSQL|http://www.postgresql.org/] is included with Postxdb.
-All you have to do is include the following lines in the Postxdb configuration file.
+Add the following lines to the Postxdb configuration file.
 {code}
 dataSource.driverClassName = org.postgresql.Driver
 dataSource.username = orbeonuser

@@ -1,0 +1,39 @@
+Postxdb implements its own form definition version management.
+It works with all Orbeon versions from 3.9, that is, before and after Orbeon introduced form versions.
+The version number is included in the _form_ name.
+Postxdb version management makes sure that each form instance is connected to the form version it was created with.
+The connection remains the same even if the form is edited.
+
+Postxdb generally changes the version number when an XML form definition is saved.
+The new version number of the form will follow the latest version previously present in the database.
+
+There is an exception to this rule.
+If no version exists previously the newly added form definition will keep its version number, if it has one.
+
+Form definitions are either *drafts* (_Save_ in the Orbeon Form Builder) or *published* (_Publish_ in the builder).
+Historically their XML representations were dramatically different.
+For this reason, after publishing, the first draft of the next version is not a copy of the published version.
+The first draft must be copied from the last draft of the previous version.
+In summary, publishing a form also creates a first draft of the next version in addition to creating the published version.
+
+Every form has a _current draft_.
+In the Postxdb database browser the current draft is the only editable version of the form.
+By using the REST API it is possible to edit any draft.
+The result of the edit will be stored as a new draft with a version number incremented from the previous current draft.
+This means that version history is a linear sequence without branches.
+
+The syntax of a version designation is
+{code}
+--vNNN_DD
+{code}
+where NNN is the version number (left padded with zeros) and DD is the draft number (also padded with a zero if needed).
+The version represents a draft if a draft number is present.
+Without a draft number the version represents a published form.
+
+For example, assume there is a form with app/form names @myapp/myform@.
+The first draft will be named @myapp/myform\--v001_01@.
+After editing and saving the name will be @myapp/myform\--v001_02@.
+Subsequent saves will increment the draft number similarly.
+
+The first _Publish_ of this form will generate the name @myapp/myform\--v001@.
+The current draft will be @myapp/myform\--v002_01@, the first draft of the next version.

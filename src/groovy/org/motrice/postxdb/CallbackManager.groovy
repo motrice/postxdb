@@ -95,7 +95,7 @@ class CallbackManager {
   private doCallback(String op, PxdFormdef formdef, PxdFormdefVer formdefVer, PxdItem item,
 		     boolean instance, boolean published)
   {
-    def message = "{\"op\":${op},\"formdefId\":${formdef?.id},\"formdefVerId\":${formdefVer?.id},\"itemId\":${item?.id},\"instance\":${instance},\"published\":${published}}|||"
+    def message = "{\"op\":\"${op}\",\"formdefId\":${formdef?.id},\"formdefVerId\":${formdefVer?.id},\"itemId\":${item?.id},\"instance\":${instance},\"published\":${published}}|||"
     def job = new CallbackJob(socket, tgtPortNumber, message)
     if (log.debugEnabled) log.debug "callback << '${message}' on port ${tgtPortNumber}"
     threadPool.submit(job)

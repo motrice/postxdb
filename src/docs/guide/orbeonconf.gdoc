@@ -1,0 +1,40 @@
+This subsection only describes how you make Orbeon connect to Postxdb.
+The configuration file to edit is @WEB-INF/resources/config/properties-local.xml@.
+Replace existing persistence entries with the following.
+{code:xml}
+<property
+    as="xs:string"
+    name="oxf.fr.persistence.provider.*.*.*"
+    value="exist"/>
+  
+<property 
+    as="xs:anyURI" 
+    name="oxf.fr.persistence.exist.uri" 
+    value="/fr/service/exist"/>
+
+<property 
+    as="xs:anyURI" 
+    name="oxf.fr.persistence.exist.exist-uri" 
+    value="http://localhost:48080/exist/rest/db/orbeon-pe/fr"/>
+{code}
+
+This example assumes that Postxdb runs on localhost, port 48080.
+Modify to suit your installation.
+The part after the port number is hardwired and may not be changed.
+
+h4. Orbeon 4.8
+
+Orbeon 4.8 has a bug in the eXist-db interface.
+Do not use it with Postxdb.
+
+If you absolutely have to use this Orbeon version you must use Postxdb release 1.0.8
+and modify the REST prefix in @properties-local.xml@.
+The last property in the example above must be modified as follows.
+{code:xml}
+<property 
+    as="xs:anyURI" 
+    name="oxf.fr.persistence.exist.exist-uri" 
+    value="http://localhost:48080/exist/rest/db/orbeon-48/fr"/>
+{code}
+
+Postxdb 1.0.8 lacks several features present in versions 1.1.0 upward.

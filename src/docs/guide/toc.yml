@@ -4,6 +4,8 @@ fasttrack:
   title: The Fast Track
 getstarted:
   title: Installation
+  servletcontainersetup:
+    title: Set Up The Servlet Container
   databasesetup:
     title: Set Up The Database
     h2setup:
@@ -11,12 +13,28 @@ getstarted:
     pgsetup:
       title: PostgreSQL On Linux
     mysqlsetup:
-      title: Sorry, No MySQL
-  servletcontainersetup:
-    title: Set Up the Servlet Container
+      title: MySQL 5 Upwards
 configuration:
   title: Configuration
+  configfile:
+    title: The Postxdb Configuration File
+  postxconf:
+    title: Postxdb Configuration
+  orbeonconf:
+    title: Orbeon Configuration
 features:
-  title: Reference
+  title: Features
+  versions:
+    title: Form Versions
   notifications:
     title: Storage Notifications
+api:
+  title: REST API
+  restexist:
+    title: eXist-db Methods
+    formdefrest:
+      title: Form Definitions
+    formdatarest:
+      title: Form Data (Form Instances)
+  restpostx:
+    title: Non-eXist-db Methods

@@ -3,7 +3,32 @@ This is especially relevant for Form Builder.
 It is difficult to know or control programmatically what a user does in Form Builder.
 Form Runner, on the other hand, is more flexible when it comes to button configuration.
 
-A Postxdb notification consists of a UDP packet containing a JSON array,
-equivalent to a Java/Groovy Map.
+A Postxdb notification consists of a UDP packet containing a JSON array.
 Postxdb notifications are asynchronous, meaning that they don't block the operation they are part of.
 No response is expected, configuring notifications and then not listening for them does not break anything.
+
+The notification text has the following format.
+
+{code}
+{<name-value-pair>, <name-value-pair>, ...<name-value-pair>}|||
+{code}
+
+The expected usage is to extract the text before the three vertical bars and
+have a JSON parser convert it to a java.util.Map.
+All keys are strings.
+The values are string, long (integer), boolean or @null@.
+
+The following keys are defined in every notification even though some values are null when not applicable.
+
+* *op* (string): Event name (see below)
+* *formdefId* (long): Database id of the form definition affected
+* *formdefVerId* (long): Database id of the form definition version affected
+* *itemId* (long): Database id of the affected item (XML or attachment)
+* *instance* (boolean): true if the affected item was a form instance item
+* *published* (boolean): true if the form definition was published
+
+The following event names are defined:
+* *draftFormdefItem*: A draft form definition item was saved
+* *publishedFormdefItem*: A published form definition item was saved
+* *saveInstanceItem*: An instance item was saved
+* *emptyInstanceItem*: An empty instance item was created and saved

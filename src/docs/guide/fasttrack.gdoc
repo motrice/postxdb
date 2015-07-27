@@ -1,5 +1,6 @@
-If you just want to try Postxdb with a minimum of fuss, here is the Fast Track,
+If you just want a quick Postxdb demo with a minimum of fuss, here is the Fast Track,
 using the built-in H2 database.
+See the [Installation|guide:getstarted] section if you need other options.
 
 Assuming you have Orbeon running in a servlet container, do as follows:
 * Stop the servlet container
@@ -24,13 +25,14 @@ In @properties-local.xml@, add the following entries,
       value="http://localhost:8080/exist/rest/db/orbeon-pe/fr"/>
 {code}
 
-Be sure to comment out the previous @persistence@ configuration entries.
+Be sure to comment out the previous @oxf.fr.persistence@ configuration entries.
 This example assumes the servlet container runs on localhost, port 8080.
+Modify if needed.
 
 * Start the servlet container
 * For the GUI, browse to @http://localhost:8080/exist@
 * For Orbeon Form Builder, browse to @http://localhost:8080/orbeon/fr/orbeon/builder/summary@
 
-There are no forms to start with.
+You start out with an empty database, so there are no forms.
 Use Form Builder to create new forms to experiment with.
 

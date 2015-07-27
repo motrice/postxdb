@@ -1,0 +1,2 @@
+Part of the Postxdb REST interface emulates the Orbeon interface towards eXist-db.
+For brevity we refer to those methods as _eXist-db methods_.

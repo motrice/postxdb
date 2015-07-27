@@ -120,7 +120,7 @@ class PxdFormdefVer implements Comparable {
   static transients = ['currentDraft']
   static belongsTo = [formdef: PxdFormdef]
   static constraints = {
-    path nullable: false, size: 3..400, unique: true
+    path nullable: false, size: 3..255, unique: true
     appName size: 1..120
     formName size: 1..120
     fvno range: 1..9999

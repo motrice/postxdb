@@ -133,6 +133,9 @@ class PxdItem {
     formDef index: 'Formdef_Idx'
   }
   static transients = ['formref', 'sha1']
+  /**
+   * Note on constraints: Without a max size on "stream" H2 makes it "BINARY(255)".
+   */
   static constraints = {
     path nullable: false, unique: true
     uuid nullable: true, maxSize: 200

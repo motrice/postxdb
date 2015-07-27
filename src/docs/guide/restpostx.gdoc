@@ -1,0 +1,484 @@
+Postxdb has a number of methods that do not emulate the Orbeon eXist-db persistence API.
+The purpose of many of these methods is mostly to read from the database according to the Postxdb data model.
+In general, the eXist-db methods are the only way to write to the database.
+For reading you may use either eXist-db methods or the methods in this section.
+
+Almost all methods in this section return metadata.
+
+In all methods, @$id@ denotes a 64-bit integer database id.
+
+h2. Store Initial Instance
+
+Create an empty form instance and report back its uuid.
+
+Background: There used to be a problem that Orbeon does not report back the id of a new form instance.
+The crucial part was that Orbeon insists on generating the uuid.
+Practical testing indicates that it is possible to use the normal _Save Form Data_ method with an empty body.
+
+{code}
+PUT $PREFIX/$app/$form/newinstance
+{code}
+
+where @$app@ is the Orbeon app name, @$form@ is the Orbeon form name including a (published) version number.
+
+*Returns* 201 on success and the generated uuid as plain text.
+Returns 404 if there is no form definition with the specified app/form names.
+Returns 409 on syntax error in the version designation.
+
+h2. Create Form Data from Name-Value Pairs
+
+Store form data XML from an array of name-value pairs and a reference to a form definition.
+
+{code}
+POST $POSTXDB/data/array/$app/$form/$version
+BODY: A JSON array.
+{code}
+
+where @$app@ is the Orbeon app name, @$form@ is the Orbeon form name, @$version@ is a form version.
+The version must be a published or draft version number, like @v002_03@, or @v002@.
+Normal usage is to create form data from published versions only.
+The posted data must be a string formatted as a JSON array.
+The array consists of name-value pairs where names must be strings.
+Some of the names should be names of form definition controls for the operation to be meaningful.
+
+The operation creates a form instance from the form definition.
+The instance contains all controls from the form definition.
+A value from the input array is inserted if the name agrees with a control name.
+Other values in the input array are ignored.
+Non-string values are converted to string before insertion.
+To have full control over value formats you should do the conversion before the call.
+Simple values, like integers, should not be a problem.
+
+*Returns* 201 and a uuid on success, 404 if the form definition is not found, 409 on failure, and a plain text message.
+The message contains the exception message on failure.
+
+On success a uuid is generated for the new instance and returned as the result of the operation.
+Success is returned even if no values are picked up from the input array.
+In such case there will be a form instance where all values are empty.
+
+h2. Duplicate Form Data 
+
+Duplicate items making up a form instance.
+
+NOTE: The  method actually only duplicates the XML item.
+Attachments are not duplicated for the following reason.
+The assumption is that whenever an attachment is written it gets a new uuid by Orbeon.
+Postxdb stores attachments under their uuid without the app/form names.
+Thus it is possible to just duplicate the XML item without changing any attachment references.
+
+{code}
+PUT $POSTXDB/duplicate/$srcUuid/$tgtUuid[?ro=true|false]
+{code}
+
+where @$srcUuid@ is the uuid of the existing instance while @$tgtUuid@ must be the uuid of the new instance.
+By default the source instance is made read-only.
+You may control the read-only state of the source instance explicitly with the @ro@ parameter.
+
+*Returns* an XML list of @pxdItem@ metadata as in the Items methods below.
+The list always contains a single @pxdItem@, the new instance item.
+Sample output:
+{code:xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+  <pxdItem>
+    <ref>1632</ref>
+    <created>2014-08-19 09:26:46.370 CEST</created>
+    <path>763225b92113b85f93948f53193ecb3f2ec1c002/data.xml</path>
+    <uuid>763225b92113b85f93948f53193ecb3f2ec1c002</uuid>
+    <origin>1625</origin>
+    <formpath>soder/wrap1--v002</formpath>
+    <format>xml</format>
+    <size>460</size>
+    <sha1>2b38370625bffb24425c2571ca099c0d40eb8acf</sha1>
+  </pxdItem>
+</list>
+{code}
+
+In case of error the method contains the XML rendering of the error object.
+The most likely reason for an error is that the target uuid already exists in the database.
+Sample error output:
+{code:xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<errors>
+  <error object="org.motrice.postxdb.PxdItem" field="path">
+    <rejected-value>763225b92113b85f93948f53193ecb3f2ec1c001/data.xml</rejected-value>
+    <message>Property [Path] of class [Contents] with value [763225b92113b85f93948f53193ecb3f2ec1c001/data.xml] must be unique</message>
+  </error>
+</errors>
+{code}
+
+h2. Read-Only Form Data
+
+Set or get the read-only state of a form instance.
+An instance may consist of several items.
+All items of an instance have their read-only state set.
+The GET method only checks the XML item.
+
+{code}
+PUT $POSTXDB/readonly/$uuid[?ro=true|false]
+GET $POSTXDB/readonly/$uuid
+{code}
+
+where @$uuid@ is the uuid of the instance.
+By default the PUT method makes the instance read-only.
+The @ro@ parameter may be used to set the read-only state explicitly.
+
+Sample output from the GET operation:
+{code:xml}
+<pxdItem>
+  <uuid>763225b92113b85f93948f53193ecb3f2ec1cea9</uuid>
+  <path>763225b92113b85f93948f53193ecb3f2ec1cea9/data.xml</path>
+  <readOnly>true</readOnly>
+</pxdItem>
+{code}
+
+Sample output from the PUT operation. All items of the form instance are included.
+{code:xml}
+<list size='4'>
+  <pxdItem>
+    <uuid>763225b92113b85f93948f53193ecb3f2ec1cea9</uuid>
+    <path>763225b92113b85f93948f53193ecb3f2ec1cea9/data.xml</path>
+    <readOnly>true</readOnly>
+  </pxdItem>
+  <pxdItem>
+    <uuid>763225b92113b85f93948f53193ecb3f2ec1cea9</uuid>
+    <path>a42cdc921b16330adfad23f0f07f5c72aafdde3f.bin</path>
+    <readOnly>true</readOnly>
+  </pxdItem>
+  <pxdItem>
+    <uuid>763225b92113b85f93948f53193ecb3f2ec1cea9</uuid>
+    <path>fe3b634482d8b69693340725aa4d365a1fd8a3f0.bin</path>
+    <readOnly>true</readOnly>
+  </pxdItem>
+  <pxdItem>
+    <uuid>763225b92113b85f93948f53193ecb3f2ec1cea9</uuid>
+    <path>74b1c63182a0d51eafd68c348b3e1a4d6f75dcb5.bin</path>
+    <readOnly>true</readOnly>
+  </pxdItem>
+</list>
+{code}
+
+h2. Add Languages To A Form Definition
+
+Add one or more languages to a form definition, given a source language that is already present in the form.
+The target languages are copied from the source language.
+Use the Orbeon Form Builder to translate.
+
+The method works on the current draft and creates another draft that becomes current.
+
+The _allow add language_ configuration property must be enabled, see below.
+
+{code}
+PUT $POSTXDB/language/$app/$form?spec=$language-spec
+{code}
+
+@language-spec@ must contain a source language and a sequence of one or more target languages.
+A language is either a two-letter ISO language abbreviation, like @en@, or a locale according to Java conventions, like @en_US@.
+
+Example:
+{code}
+?spec=sv~en.fr
+{code}
+
+In this language spec the language @sv@ (Swedish) is the source language, while English and French are target languages.
+The separators tilde (~) and dot (.) are chosen such that a language spec does not need URL encoding.
+
+The source language is copied to the target languages.
+In the example this means that the new English and French versions will contain Swedish text.
+
+h3. Configuration Properties
+
+In order for this function to have any effect the following configuration property must be set:
+
+{code}
+postxdb.allow.rest.add.language = true
+{code}
+
+Any value except @true@ is taken as _false_.
+
+A similar property enables this function in the Postxdb gui.
+See the section on [Postxdb configuration|guide:postxconf].
+
+h3. Restrictions
+
+The languages in a language spec must be known languages or locales.
+The new languages must be included in available languages in the Orbeon configuration.
+Otherwise they won't be visible in Orbeon Form Builder or Form Runner.
+
+h3. Return Status and Messages
+
+The method returns HTTP status 200 without any change to the form if add language is not configured or if the language spec is missing.
+
+The method returns status 201 if languages were successfully added.
+The response contains a small XML structure containing the added languages and the languages available in the form after the operation.
+
+Sample output:
+{code:xml}
+<languages>
+  <added>
+    <language>es</language>
+  </added>
+  <available>
+    <language>de</language>
+    <language>en</language>
+    <language>es</language>
+    <language>sv</language>
+  </available>
+</languages>
+{code}
+
+The method returns 409 and a message if a conflict occurs.
+The message begins with one of the message codes below followed by a vertical bar.
+A readable diagnostic message is appended.
+In this way conflict messages may be parsed programmatically and also read by humans.
+
+{code}
+POSTXDB.110=The source language is not present in the form
+POSTXDB.111=The source language is also a target language
+POSTXDB.112=A target language is not a known language or locale
+POSTXDB.113=Language spec syntax error
+POSTXDB.114=No language added, add language not enabled or no language spec
+POSTXDB.115=Form definition not found with these app and form names
+POSTXDB.116=A target language is present in the form
+POSTXDB.117=Input array could not be decoded
+POSTXDB.118=Internal conflict decoding form definition
+{code}
+
+The format of a conflict message is an XML conflict element containing the message string. Example:
+
+{code:xml}
+<conflict>POSTXDB.113|Language spec [sv] syntax error</conflict>
+{code}
+
+h2. List Languages In A Form Definition
+
+List the languages available in a form definition.
+
+{code}
+GET $POSTXDB/language/$app/$form[?version=$version]
+{code}
+
+Without the optional @version@ parameter the method examines the current draft of the form.
+Otherwise the version may indicate a published or draft version.
+
+Examples: @?version=v002@ (published), or @?version=v002_03@ (draft)
+
+The method returns HTTP status 200 and a list of languages.
+The list of languages is formatted as XML. Sample output.
+
+{code:xml}
+<languages>
+  <language>de</language>
+  <language>en</language>
+  <language>sv</language>
+</languages>
+{code}
+
+The method returns status 409 and a message if a conflict occurs.
+The format of the conflict message is the same as the previous (add languages) method.
+
+h2. Form Definitions
+
+Get form definition metadata.
+A form definition is a versionless, generic entity without content.
+These methods return an XML structure.
+
+{code}
+GET $POSTXDB/formdef
+GET $POSTXDB/formdef/$id
+{code}
+
+The first method lists all form definitions.
+The second method returns the same data for a specific form definition.
+It returns a list although it always contains a single form definition.
+Sample output from the first form:
+
+{code:xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+  <pxdFormdef>
+    <ref gen="6">121</ref>
+    <created>2013-09-19 22:08:52.619 CEST</created>
+    <updated>2013-10-03 10:12:30.893 CEST</updated>
+    <app>basprocess</app>
+    <form>beslut</form>
+    <uuid>3e67a1e277b054ed495b2b52f04b5682</uuid>
+    <currentDraft>basprocess/beslut--v003_01</currentDraft>
+  </pxdFormdef>
+  <pxdFormdef>
+    <ref gen="6">128</ref>
+    <created>2013-09-19 22:12:07.957 CEST</created>
+    <updated>2013-10-03 10:12:41.79 CEST</updated>
+    <app>basprocess</app>
+    <form>handlagga</form>
+    <uuid>25750f24fb39da6e7085e12e0440da78</uuid>
+    <currentDraft>basprocess/handlagga--v003_01</currentDraft>
+  </pxdFormdef>
+  <pxdFormdef>
+    <ref gen="6">114</ref>
+    <created>2013-09-19 22:04:54.225 CEST</created>
+    <updated>2013-10-03 10:12:52.286 CEST</updated>
+    <app>basprocess</app>
+    <form>registrera</form>
+    <uuid>9d04589a006d16ba1b48e1d96f48b82b</uuid>
+    <currentDraft>basprocess/registrera--v003_01</currentDraft>
+  </pxdFormdef>
+</list>
+{code}
+
+The @ref@ element contains the database id of an object.
+The @gen@ attribute of the @ref@ element is the Hibernate version number, the number of times this object has been updated.
+
+h2. Form Definition Versions
+
+Get form definition version metadata.
+
+{code}
+GET $POSTXDB/formdefver/$id
+GET $POSTXDB/formdefver?{uuid=$uuid | formdef=$id}
+{code}
+
+The first method gets a specific form definition version.
+The second method gets all form definition versions of the given form definition sorted with the latest version first.
+The output format of the two methods are identical;
+the first method returns a list even though it always contains a single form definition version.
+Sample output from the second method:
+
+{code:xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+  <pxdFormdefVer>
+    <ref>134</ref>
+    <formref>128</formref>
+    <created>2013-09-19 22:12:26.624 CEST</created>
+    <app>basprocess</app>
+    <form>handlagga</form>
+    <path>basprocess/handlagga--v002_01</path>
+    <verno published="false">2</verno>
+    <draft>1</draft>
+    <title>Handläggning</title>
+    <description />
+    <language>en</language>
+  </pxdFormdefVer>
+  <pxdFormdefVer>
+    <ref>131</ref>
+    <formref>128</formref>
+    <created>2013-09-19 22:12:26.603 CEST</created>
+    <app>basprocess</app>
+    <form>handlagga</form>
+    <path>basprocess/handlagga--v001</path>
+    <verno published="true">1</verno>
+    <draft />
+    <title>Handläggning</title>
+    <description />
+    <language>sv</language>
+  </pxdFormdefVer>
+  <pxdFormdefVer>
+    <ref>129</ref>
+    <formref>128</formref>
+    <created>2013-09-19 22:12:07.961 CEST</created>
+    <app>basprocess</app>
+    <form>handlagga</form>
+    <path>basprocess/handlagga--v001_01</path>
+    <verno published="false">1</verno>
+    <draft>1</draft>
+    <title>Handläggning</title>
+    <description />
+    <language>en</language>
+  </pxdFormdefVer>
+</list>
+{code}
+
+A few notes:
+
+* The @ref@ element contains the database id of an object
+* Similarly, the @formref@ contains the database id of the form definition object this version is related to.
+* The @verno@ element contains the form version number. Its @published@ attribute indicates whether the form version is published. This fact can be derived from the version number, but the purpose is to avoid having clients decode version numbers.
+* The @draft@ element contains the draft number, or is empty for published versions
+
+The version number in the @verno@ element is the internal database representation, an integer.
+
+h2. Items
+
+Get item data.
+An item is some content of a form, either XML or any resource.
+Items are the substance of form definitions and form instances.
+An item may be part of a form definition (defitem) or a form instance (institem).
+
+The two first methods return metadata. The very last method gets item content.
+
+{code}
+GET $POSTXDB/defitem?{uuid=$uuid | formdef=$id}
+GET $POSTXDB/institem?formdefver=$id
+GET $POSTXDB/item/$id
+{code}
+
+The first methods return a list containing item metadata in no particular order.
+The last method returns an item, regardless of whether it belongs to a form definition or a form instance.
+It may be an object of any size.
+Its @Content-Type@ is either @application/xml;charset=UTF-8@ or @application/octet-stream@.
+
+Sample (truncated) output from @.../defitem?formdef=1222@:
+
+{code:xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+    <pxdItem>
+        <ref>1628</ref>
+        <created>2014-08-17 22:41:03.618 CEST</created>
+        <path>763225b92113b85f93948f53193ecb3f2ec1c000/data.xml</path>
+        <uuid>763225b92113b85f93948f53193ecb3f2ec1c000</uuid>
+        <origin>1625</origin>
+        <formpath>soder/wrap1--v002</formpath>
+        <format>xml</format>
+        <size>474</size>
+        <sha1>790caa78b3c6f6be2ff924d72d91aeaf6fac18ee</sha1>
+    </pxdItem>
+    <pxdItem>
+        <ref>1629</ref>
+        <created>2014-08-17 22:44:32.373 CEST</created>
+        <path>ec3fe168aa7d70e854413002838dd1573aeaa2cb.bin</path>
+        <uuid>763225b92113b85f93948f53193ecb3f2ec1c000</uuid>
+        <formpath>soder/wrap1--v002</formpath>
+        <format>binary</format>
+        <size>9629</size>
+        <sha1>c848d8ccb5bb6a461f9a9efebb1e2e315e2c49a2</sha1>
+    </pxdItem>
+    <pxdItem>
+        <ref>1627</ref>
+        <created>2014-08-16 19:28:33.949 CEST</created>
+        <path>a42cdc921b16330adfad23f0f07f5c72aafdde3f.bin</path>
+        <uuid>763225b92113b85f93948f53193ecb3f2ec1cea9</uuid>
+        <readonly>true</readonly>
+        <formpath>soder/wrap1--v002</formpath>
+        <format>binary</format>
+        <size>782640</size>
+        <sha1>4904fa1b3bcb1c4c438b8cd90c3bc5037ed18ffa</sha1>
+    </pxdItem>
+    <pxdItem>
+        <ref>1625</ref>
+        <created>2014-08-16 19:20:02.664 CEST</created>
+        <path>763225b92113b85f93948f53193ecb3f2ec1cea9/data.xml</path>
+        <uuid>763225b92113b85f93948f53193ecb3f2ec1cea9</uuid>
+        <readonly>true</readonly>
+        <formpath>soder/wrap1--v002</formpath>
+        <format>xml</format>
+        <size>460</size>
+        <sha1>2b38370625bffb24425c2571ca099c0d40eb8acf</sha1>
+    </pxdItem>
+</list>
+{code}
+
+Notes:
+
+* The @formref@ element contains the database id of the form definition object
+* The @uuid@ element contains the same uuid as the form definition object
+* The @format@ can be xml or binary
+* The @sha1@ element contains a SHA1 hash sum of item contents in hex format
+
+When relevant the following elements may also occur:
+
+* The @readonly@ element is present (true/false) if the read-only state has been explicitly set. Otherwise it is omitted which means that the item is not read-only.
+* The @origin@ element, if present, means that the item was originally duplicated from some other item. The element contains the database id of the original item.
+
+The @institem@ method returns HTTP 404 if no items are found.
