@@ -2,7 +2,7 @@ Database configuration is one of the main parts of a Postxdb setup.
 The [database setup|guide:databasesetup] description contains examples of this part of the configuration.
 Regardless of database, the following properties are needed:
 {code}
-dataSource.driverClassName = ...
+dataSource.driverClassName = <fully qualified Java class name>
 dataSource.username = orbeonuser
 dataSource.password = howdy!howdy
 dataSource.url = jdbc:...
@@ -12,12 +12,13 @@ where @orbeonuser@ is a database user that has database access.
 Its privileges must include create table and select/insert/update.
 You may freely use a different name for this user, and (of course) some other password.
 
-If you want the Postxdb GUI to be able to run forms with the Orbeon Form Builder and Form Runner,
-then add the following configuration entries.
-Modify accordingly if Orbeon does not run on @localhost:8080@
+By default the Postxdb GUI expects Orbeon to run on port 8080 on localhost
+according to the property below.
+If this is the desired behavior you don't have to include this property.
+Modify accordingly if Orbeon does not run on @localhost:8080@.
+Set the property to an empty value if you want to avoid linking to Orbeon.
 {code}
-postxdb.formBuilder.urlBase = http://localhost:8080/orbeon/fr/orbeon/builder
-postxdb.formRunner.urlBase = http://localhost:8080/orbeon/fr
+postxdb.orbeon.urlBase = http://localhost:8080/orbeon/fr
 {code}
 
 If you want storage notifications, then add the following configuration entries.
@@ -34,15 +35,15 @@ It is not possible (nor advisable at this stage) to send notifications to other 
 If you want to allow languages to be added to forms from the Postxdb browser,
 set the following property.
 {code}
-postxdb.allow.gui.add.language = true
+postxdb.gui.allowAddLanguage = true
 {code}
 
 There is a similar configuration item to allow the REST API to add languages.
 It is described among the [Postxdb methods|guide:restpostx] in the API documentation.
 
-h4. Postxdb Build Configuration
+h4. Configuration for Building Postxdb
 
-A configuration must be defined if you build Postxdb.
+A configuration must be defined if you build Postxdb from source.
 You specify the configuration file using an environment variable or system property as [described here|guide:configfile].
 The main difference is that you need a separate test database unless you turn off all testing during the build.
 Create the database the same way you created the main database, and do not create any tables.
@@ -70,3 +71,5 @@ If the test database uses a different username or password, add those properties
 
 If you build Postxdb without a separate test database, data will be written to whatever database is configured.
 Tests will fail if you repeat them because they expect a clean database.
+
+A typical build command is @mvn clean install@ (using Maven).

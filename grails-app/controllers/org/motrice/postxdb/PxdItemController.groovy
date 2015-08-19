@@ -27,7 +27,7 @@ import org.motrice.postxdb.PxdItem;
 import org.springframework.dao.DataIntegrityViolationException
 
 class PxdItemController {
-
+  def configService
   def itemService
 
   static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -38,7 +38,20 @@ class PxdItemController {
 
   def list(Integer max) {
     params.max = Math.min(max ?: 15, 100)
-    [pxdItemObjList: PxdItem.list(params), pxdItemObjTotal: PxdItem.count()]
+    [pxdItemObjList: PxdItem.list(params), pxdItemObjTotal: PxdItem.count(),
+    frEdit: configService.formRunnerEdit()]
+  }
+
+  /**
+   * List instances
+   */
+  def listInst(Integer max) {
+    params.max = Math.min(max ?: 15, 100)
+    def list = PxdItem.findAllByInstance(true, params)
+    def count = PxdItem.countByInstance(true)
+    // frEdit is either a closure or null
+    render(view: 'list',
+    model: [pxdItemObjList: list, pxdItemObjTotal: count, frEdit: configService.formRunnerEdit()])
   }
 
   /**
@@ -56,22 +69,7 @@ class PxdItemController {
 
     def itemList = PxdItem.findAllByFormDef(pxdFormdefVerObj.path)
     def total = itemList.size()
-    render(view: 'list', model: [pxdItemObjList: itemList, pxdItemObjTotal:total])
-  }
-
-  def create() {
-    [pxdItemObj: new PxdItem(params)]
-  }
-
-  def save() {
-    def pxdItemObj = new PxdItem(params)
-    if (!pxdItemObj.save(flush: true)) {
-      render(view: "create", model: [pxdItemObj: pxdItemObj])
-      return
-    }
-
-    flash.message = message(code: 'default.created.message', args: [message(code: 'pxdItem.label', default: 'PxdItem'), pxdItemObj.id])
-    redirect(action: "show", id: pxdItemObj.id)
+    render(view: 'list', model: [pxdItemObjList: itemList, pxdItemObjTotal:total, frEdit: configService.formRunnerEdit()])
   }
 
   def show(Long id) {

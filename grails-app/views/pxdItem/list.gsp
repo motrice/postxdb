@@ -33,11 +33,6 @@
   </head>
   <body>
     <a href="#list-pxdItem" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-    <div class="nav" role="navigation">
-      <ul>
-	<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-      </ul>
-    </div>
     <div id="list-pxdItem" class="content scaffold-list" role="main">
       <h1><g:message code="default.list.label" args="[entityName]" /></h1>
       <g:if test="${flash.message}">
@@ -47,22 +42,26 @@
 	<thead>
 	  <tr>
 	    <g:sortableColumn property="path" title="${message(code: 'pxdItem.path.label', default: 'Path')}" />
-	    <g:sortableColumn property="instance" title="${message(code: 'pxdItem.instance.label', default: 'Format')}" />
-	    <g:sortableColumn property="format" title="${message(code: 'pxdItem.format.label', default: 'Format')}" />
-	    <g:sortableColumn property="uuid" title="${message(code: 'pxdItem.uuid.label', default: 'Uuid')}" />
+	    <g:sortableColumn property="instance" title="${message(code: 'pxdItem.instance.label', default: 'Categ')}" />
 	    <g:sortableColumn property="formDef" title="${message(code: 'pxdItem.formDef.label', default: 'Form Def')}" />
-	    <g:sortableColumn property="dateCreated" title="${message(code: 'pxdItem.dateCreated.label', default: 'Date Created')}" />
+	    <g:sortableColumn property="lastUpdated" title="${message(code: 'pxdItem.lastUpdated.label', default: 'Timestamp')}" />
+	    <g:sortableColumn property="uuid" title="${message(code: 'pxdItem.uuid.label', default: 'Uuid')}" />
 	  </tr>
 	</thead>
 	<tbody>
 	  <g:each in="${pxdItemObjList}" status="i" var="pxdItemObj">
 	    <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-	      <td><g:link action="show" id="${pxdItemObj.id}">${fieldValue(bean: pxdItemObj, field: "path")}</g:link></td>
+	      <g:set var="editUrl" value="${frEdit? frEdit(pxdItemObj) : null}"/>
+	      <g:if test="${editUrl}">
+		<td><a href="${editUrl}" target="_">${fieldValue(bean: pxdItemObj, field: "path")}</a></td>
+	      </g:if>
+	      <g:else>
+		<td>${fieldValue(bean: pxdItemObj, field: "path")}</td>
+	      </g:else>
 	      <td><g:instflag flag="${pxdItemObj?.instance}"/></td>
-	      <td>${fieldValue(bean: pxdItemObj, field: "format")}</td>
-	      <td><g:abbr text="${pxdItemObj.uuid}"/></td>
 	      <td>${fieldValue(bean: pxdItemObj, field: "formDef")}</td>
-	      <td><g:formatDate date="${pxdItemObj.dateCreated}" /></td>
+	      <td><g:formatDate date="${pxdItemObj?.lastUpdated}"/></td>
+	      <td><g:link action="show" id="${pxdItemObj.id}"><g:abbr text="${pxdItemObj?.uuid}"/></g:link></td>
 	    </tr>
 	  </g:each>
 	</tbody>

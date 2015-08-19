@@ -1,14 +1,23 @@
 Postxdb is a persistence backend to [Orbeon Forms|http://www.orbeon.com/].
 In terms of interfaces it is a drop-in replacement for the [eXist XML database|http://exist-db.org/exist/apps/homepage/index.html]
 with Orbeon Forms.
-In terms of functionality significant features have been added to aid Orbeon integration with other applications.
+However, it stores all data in the relational database of your choice.
+All necessary XML processing is done by Postxdb, none is expected from the database.
+This is an important key to portability since databases differ greatly in their XML capabilities.
+
+Postxdb has a number of features that aid Orbeon integration with other applications.
+The most important one may be that all form metadata is immediately available through plain SQL,
+no XML processing is necessary.
 
 Postxdb needs a servlet container (like, for instance, [Apache Tomcat|http://tomcat.apache.org/])
 and a SQL database.
 Postxdb has been tested extensively with Apache Tomcat and the [PostgreSQL database|http://www.postgresql.org/].
-However, Postxdb relies on [Hibernate|http://hibernate.org/] for its database transactions
+Other databases that work in our tests are H2 and MySQL.
+Postxdb relies on [Hibernate|http://hibernate.org/] for its database transactions
 and Hibernate works with most relational databases, and then some.
-There is great potential for adapting to other database systems.
+This is the reason we expect other databases to be added to the list without great efforts.
+
+Postxdb creates its tables automatically, you only have to provide a suitable database.
 
 h4. What Does It Do?
 
@@ -17,12 +26,12 @@ The most visible services of Postxdb are,
 1. Forms version management,
 1. A web-based database browser for developers
 
-The database browser allows you (if so configured) to run forms in Orbeon Builder and Orbeon Form Runner.
+The database browser allows you (if so configured) to examine form metadata and run forms in Orbeon Builder and Orbeon Form Runner.
 
 The main benefits of using Postxdb become evident when you integrate or interface Orbeon Forms
 with other applications.
 Postxdb provides a clean data model which is easy to use, including attachments.
-All form metadata is immediately available through SQL queries, no XML processing is needed.
+All form metadata is immediately available through straightforward SQL queries, no XML processing is needed.
 Other applications may interface the database directly or through REST services.
 
 Several useful REST services have been added, for instance,
@@ -39,7 +48,7 @@ Other noteworthy features are,
 h4. How Does It Do It?
 
 Postxdb hooks up to Orbeon forms just like the eXist-db database does.
-Orbeon has no idea it is talking to a different persistence backend.
+Orbeon is not aware of the different persistence backend.
 
 Postxdb connects to its database through Hibernate.
 Changing the underlying database may be as simple as providing another JDBC driver

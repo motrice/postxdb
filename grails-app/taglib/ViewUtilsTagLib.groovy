@@ -25,6 +25,8 @@
  * Various view utility tags
  */ 
 class ViewUtilsTagLib {
+  def configService
+
   /**
    * Tag for displaying the instance boolean in PxdItem
    */
@@ -39,4 +41,13 @@ class ViewUtilsTagLib {
     def str = attrs.text
     out << ((str.length() > 18)? "${str[0..4]}...${str[-5..-1]}" : str)
   }
+
+  /**
+   * Return the URL for creating a new form in Form Builder, or null
+   * if Orbeon is not configured.
+   */
+  def formBuilderNewUrl = {attrs, body ->
+    out << configService.formBuilderNew()
+  }
+
 }

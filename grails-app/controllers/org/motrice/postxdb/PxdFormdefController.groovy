@@ -29,6 +29,7 @@ import org.springframework.dao.DataIntegrityViolationException
 class PxdFormdefController {
 
   def grailsApplication
+  def configService
   def restService
 
   static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -38,24 +39,9 @@ class PxdFormdefController {
   }
 
   def list(Integer max) {
-    params.max = Math.min(max ?: 10, 100)
-    def dbUrl = grailsApplication.config.dataSource.url
-    [pxdFormdefObjList: PxdFormdef.list(params), pxdFormdefObjTotal: PxdFormdef.count(), dbUrl: dbUrl]
-  }
-
-  def create() {
-    [pxdFormdefObj: new PxdFormdef(params)]
-  }
-
-  def save() {
-    def pxdFormdefObj = new PxdFormdef(params)
-    if (!pxdFormdefObj.save(flush: true)) {
-      render(view: "create", model: [pxdFormdefObj: pxdFormdefObj])
-      return
-    }
-
-    flash.message = message(code: 'default.created.message', args: [message(code: 'pxdFormdef.label', default: 'PxdFormdef'), pxdFormdefObj.id])
-    redirect(action: "show", id: pxdFormdefObj.id)
+    params.max = Math.min(max ?: 15, 100)
+    [pxdFormdefObjList: PxdFormdef.list(params), pxdFormdefObjTotal: PxdFormdef.count(),
+    frNew: configService.formRunnerNew(), fbEdit: configService.formBuilderEdit()]
   }
 
   def addLanguages(Long id) {
@@ -72,7 +58,7 @@ class PxdFormdefController {
   def commitLanguages(AddLanguagesCommand cmd) {
     if (log.debugEnabled) log.debug "COMMIT LANGUAGES: ${params} ${cmd}"
     def formdef = PxdFormdef.get(params.id)
-    def enableProp = grailsApplication.config.postxdb.allow.gui.add.language
+    def enableProp = grailsApplication.config.postxdb.gui.allowAddLanguage
     boolean enableFlag = enableProp == 'true'
 
     if (enableFlag) {
@@ -98,49 +84,35 @@ class PxdFormdefController {
       return
     }
 
-    def enableProp = grailsApplication.config.postxdb.allow.gui.add.language
+    def enableProp = grailsApplication.config.postxdb.gui.allowAddLanguage
     Boolean enableFlag = enableProp == 'true'
     [pxdFormdefObj: pxdFormdefObj, addLangEnable: enableFlag]
   }
 
-  def edit(Long id) {
-    def pxdFormdefObj = PxdFormdef.get(id)
-    if (!pxdFormdefObj) {
-      flash.message = message(code: 'default.not.found.message', args: [message(code: 'pxdFormdef.label', default: 'PxdFormdef'), id])
-      redirect(action: "list")
-      return
+  def showconfig() {
+    // Display table for decoding resources
+    def table = [:]
+    // Configured
+    def appName = grailsApplication.metadata.'app.name'
+    table[1] = display("/${appName}/images/bullet_white.png", 'config.liveness.1')
+    table[2] = display("/${appName}/images/exclamation.png", 'config.liveness.2')
+    table[3] = display("/${appName}/images/tick.png", 'config.liveness.3')
+    table[4] = display("/${appName}/images/cross.png", 'config.liveness.4')
+    table[5] = display("/${appName}/images/comment.png", 'config.liveness.5')
+    def configList = configService.configDisplay()
+    // Replace stuff in the list
+    def displayList = configList.collect {item ->
+      def res = table[item.state]
+      item.name = message(code: item.name)
+      item.img = res.img
+      item.title = message(code: res.title)
+      return item
     }
-
-    [pxdFormdefObj: pxdFormdefObj]
+    [config: displayList]
   }
 
-  def update(Long id, Long version) {
-    def pxdFormdefObj = PxdFormdef.get(id)
-    if (!pxdFormdefObj) {
-      flash.message = message(code: 'default.not.found.message', args: [message(code: 'pxdFormdef.label', default: 'PxdFormdef'), id])
-      redirect(action: "list")
-      return
-    }
-
-    if (version != null) {
-      if (pxdFormdefObj.version > version) {
-	pxdFormdefObj.errors.rejectValue("version", "default.optimistic.locking.failure",
-					 [message(code: 'pxdFormdef.label', default: 'PxdFormdef')] as Object[],
-					 "Another user has updated this PxdFormdef while you were editing")
-	render(view: "edit", model: [pxdFormdefObj: pxdFormdefObj])
-	return
-      }
-    }
-
-    pxdFormdefObj.properties = params
-
-    if (!pxdFormdefObj.save(flush: true)) {
-      render(view: "edit", model: [pxdFormdefObj: pxdFormdefObj])
-      return
-    }
-
-    flash.message = message(code: 'default.updated.message', args: [message(code: 'pxdFormdef.label', default: 'PxdFormdef'), pxdFormdefObj.id])
-    redirect(action: "show", id: pxdFormdefObj.id)
+  private Map display (String img, String title) {
+    [img: img, title: title]
   }
 
   def delete(Long id) {

@@ -214,7 +214,7 @@ class RestPostxdbController {
    */
   def languageadd(String spec) {
     if (log.debugEnabled) log.debug "ADD LANG << ${Util.clean(params)}, ${request.forwardURI}"
-    def enableProp = grailsApplication.config.postxdb.allow.rest.add.language
+    def enableProp = grailsApplication.config.postxdb.rest.allowAddLanguage
     boolean enableFlag = enableProp == 'true'
     if (enableFlag && spec) {
       try {

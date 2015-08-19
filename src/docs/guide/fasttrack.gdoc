@@ -4,25 +4,27 @@ See the [Installation|guide:getstarted] section if you need other options.
 
 Assuming you have Orbeon running in a servlet container, do as follows:
 * Stop the servlet container
-* Rename the Postxdb war file to @exist.war@ and drop it into the servlet container
+* Rename the Postxdb war file to @postxdb.war@ and drop it into the servlet container
 * Edit the Orbeon @properties-local.xml@ configuration file. You find it under @WEB-INF/resources/config@
 
 In @properties-local.xml@, add the following entries,
-{code}
-  <property
-      as="xs:string"
-      name="oxf.fr.persistence.provider.*.*.*"
-      value="exist"/>
-  
-  <property 
-      as="xs:anyURI" 
-      name="oxf.fr.persistence.exist.uri" 
-      value="/fr/service/exist"/>
+{code:xml}
+ <property
+     as="xs:string"
+     name="oxf.fr.persistence.provider.*.*.*"
+     value="exist"/>
 
-  <property 
-      as="xs:anyURI" 
-      name="oxf.fr.persistence.exist.exist-uri" 
-      value="http://localhost:8080/exist/rest/db/orbeon-pe/fr"/>
+ <!-- Orbeon 3.9 -->
+ <property 
+     as="xs:anyURI" 
+     name="oxf.fr.persistence.service.exist.uri" 
+     value="http://localhost:48080/postxdb/rest/db/orbeon-pe/fr"/>
+
+ <!-- Orbeon 4.0 and up -->
+ <property 
+     as="xs:anyURI" 
+     name="oxf.fr.persistence.exist.exist-uri" 
+     value="http://localhost:48080/postxdb/rest/db/orbeon-pe/fr"/>
 {code}
 
 Be sure to comment out the previous @oxf.fr.persistence@ configuration entries.
@@ -30,7 +32,7 @@ This example assumes the servlet container runs on localhost, port 8080.
 Modify if needed.
 
 * Start the servlet container
-* For the GUI, browse to @http://localhost:8080/exist@
+* For the GUI, browse to @http://localhost:8080/postxdb@
 * For Orbeon Form Builder, browse to @http://localhost:8080/orbeon/fr/orbeon/builder/summary@
 
 You start out with an empty database, so there are no forms.

@@ -6,16 +6,18 @@ Replace existing persistence entries with the following.
     as="xs:string"
     name="oxf.fr.persistence.provider.*.*.*"
     value="exist"/>
-  
-<property 
-    as="xs:anyURI" 
-    name="oxf.fr.persistence.exist.uri" 
-    value="/fr/service/exist"/>
 
-<property 
-    as="xs:anyURI" 
-    name="oxf.fr.persistence.exist.exist-uri" 
-    value="http://localhost:48080/exist/rest/db/orbeon-pe/fr"/>
+ <!-- Orbeon 3.9 -->
+ <property 
+     as="xs:anyURI" 
+     name="oxf.fr.persistence.service.exist.uri" 
+     value="http://localhost:48080/postxdb/rest/db/orbeon-pe/fr"/>
+
+ <!-- Orbeon 4.0 and up -->
+ <property 
+     as="xs:anyURI" 
+     name="oxf.fr.persistence.exist.exist-uri" 
+     value="http://localhost:48080/postxdb/rest/db/orbeon-pe/fr"/>
 {code}
 
 This example assumes that Postxdb runs on localhost, port 48080.
@@ -34,7 +36,7 @@ The last property in the example above must be modified as follows.
 <property 
     as="xs:anyURI" 
     name="oxf.fr.persistence.exist.exist-uri" 
-    value="http://localhost:48080/exist/rest/db/orbeon-48/fr"/>
+    value="http://localhost:48080/postxdb/rest/db/orbeon-48/fr"/>
 {code}
 
 Postxdb 1.0.8 lacks several features present in versions 1.1.0 upward.

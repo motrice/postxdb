@@ -1,8 +1,7 @@
 Postxdb has been thoroughly tested with the Apache Tomcat servlet container.
 Other servlet containers may be added to this description over time.
 
-As distributed, the Postxdb war file is named @exist-n.n.n.war@ where @n.n.n@ is the version number.
-The name refers to the eXist-db database whose interface Postxdb emulates.
+As distributed, the Postxdb war file is named @postxdb-n.n.n.war@ where @n.n.n@ is the version number.
 
 You probably already have Orbeon Forms running in a servlet container.
 In such case an easy option is to add Postxdb as an additional servlet in the same container.
@@ -14,7 +13,7 @@ h4. Apache Tomcat
 If you install a separate Tomcat for Postxdb, be sure to edit @conf/server.xml@ to use
 a different port than Orbeon Forms.
 
-Rename the Postxdb war file (@exist-n.n.n.war@) to @exist.war@ (no version number).
+Rename the Postxdb war file (@postxdb-n.n.n.war@) to @postxdb.war@ (no version number).
 Drop it into the Tomcat @webapps@ directory.
 
 Unless you use the default H2 database you will need
@@ -29,7 +28,7 @@ You may expand it manually or just start and stop Tomcat, ignoring error message
 
 h4. Other Generic Servlet Container
 
-Rename the Postxdb war file (@exist-n.n.n.war@) to @exist.war@ (no version number)
+Rename the Postxdb war file (@postxdb-n.n.n.war@) to @postxdb.war@ (no version number)
 before adding it to the servlet container.
 
 Unless you use the default H2 database you will need

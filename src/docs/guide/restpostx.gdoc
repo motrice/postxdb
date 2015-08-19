@@ -191,7 +191,7 @@ h3. Configuration Properties
 In order for this function to have any effect the following configuration property must be set:
 
 {code}
-postxdb.allow.rest.add.language = true
+postxdb.rest.allowAddLanguage = true
 {code}
 
 Any value except @true@ is taken as _false_.

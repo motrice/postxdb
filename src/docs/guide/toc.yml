@@ -28,6 +28,8 @@ features:
     title: Form Versions
   notifications:
     title: Storage Notifications
+gui:
+  title: The Database Browser
 api:
   title: REST API
   restexist:

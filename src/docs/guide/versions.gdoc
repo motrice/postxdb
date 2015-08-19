@@ -1,8 +1,8 @@
-Postxdb implements its own form definition version management.
+Postxdb implements its own version management of form definitions.
 It works with all Orbeon versions from 3.9, that is, before and after Orbeon introduced form versions.
 The version number is included in the _form_ name.
 Postxdb version management makes sure that each form instance is connected to the form version it was created with.
-The connection remains the same even if the form is edited.
+The connection remains the same even if the form definition is edited.
 
 Postxdb generally changes the version number when an XML form definition is saved.
 The new version number of the form will follow the latest version previously present in the database.
@@ -13,7 +13,7 @@ If no version exists previously the newly added form definition will keep its ve
 Form definitions are either *drafts* (_Save_ in the Orbeon Form Builder) or *published* (_Publish_ in the builder).
 Historically their XML representations were dramatically different.
 For this reason, after publishing, the first draft of the next version is not a copy of the published version.
-The first draft must be copied from the last draft of the previous version.
+The first draft is copied from the last draft of the previous version.
 In summary, publishing a form also creates a first draft of the next version in addition to creating the published version.
 
 Every form has a _current draft_.
@@ -32,7 +32,7 @@ Without a draft number the version represents a published form.
 
 For example, assume there is a form with app/form names @myapp/myform@.
 The first draft will be named @myapp/myform\--v001_01@.
-After editing and saving the name will be @myapp/myform\--v001_02@.
+After editing and saving the current draft will be @myapp/myform\--v001_02@.
 Subsequent saves will increment the draft number similarly.
 
 The first _Publish_ of this form will generate the name @myapp/myform\--v001@.

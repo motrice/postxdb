@@ -45,6 +45,9 @@ class PxdFormdefVer implements Comparable {
 
   private static final log = LogFactory.getLog(this)
 
+  /** The magic draft number that means "published" */
+  static Integer PUBLISHED = 9999
+
   /**
    * Query to find the latest non-withdrawn version of a form definition
    */
@@ -144,6 +147,15 @@ class PxdFormdefVer implements Comparable {
     return formdefVer
   }
 
+  /**
+   * Find the latest published version for a given form definition.
+   * Return null in case there is no published version.
+   */
+  static PxdFormdefVer latestPublished(PxdFormdef parent) {
+    def list = PxdFormdefVer.findAllByFormdefAndDraft(parent, PUBLISHED, [sort: 'fvno', order: 'desc'])
+    return list? list[0] : null
+  }
+
   boolean isCurrentDraft() {
     path == formdef.currentDraft
   }
@@ -210,6 +222,13 @@ class PxdFormdefVer implements Comparable {
 
   String getItemSuffix() {
     published? 'form.xhtml' : 'form.xml'
+  }
+
+  /**
+   * Return the version number as a display string.
+   */
+  String getVersionDisplay() {
+    String.format('v%03d', fvno)
   }
 
   String display() {

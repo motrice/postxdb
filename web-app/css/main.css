@@ -52,6 +52,14 @@ body {
 
 #grailsLogo {
 	background-color: #B8DBC9;
+	height: 36px;
+}
+
+#grailsLogo span.meta {
+    font-size: 30px;
+    color: #D7EAE0;
+    float: right;
+    margin-right: 0.5em;
 }
 
 /* replace with .no-boxshadow body if you have modernizr available */
@@ -92,23 +100,12 @@ img {
 
 /* GENERAL */
 
-#grailsLogo a {
-	display: inline-block;
-	margin: 2px 1em;
-}
-
-#grailsLogo span.meta {
-        font-size: 150%;
-	color: #999999;
-	vertical-align: top;
-}
-
 .content {
 }
 
 .content h1 {
 	border-bottom: 1px solid #CCCCCC;
-	margin: 0.8em 1em 0.3em;
+	margin: 0.5em 1em 0.3em;
 	padding: 0 0.25em;
 }
 
@@ -118,11 +115,11 @@ img {
 
 .footer {
 	background: #B8DBC9;
-	color: #000;
+	color: #3F755A;
 	clear: both;
-	font-size: 0.8em;
-	margin-top: 1.5em;
-	padding: 1em;
+	font-size: 0.9em;
+	margin-top: 1.1em;
+	padding: 0.5em 1em;
 	min-height: 1em;
 }
 

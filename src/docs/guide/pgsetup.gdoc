@@ -2,10 +2,10 @@ We assume that PostgreSQL is installed on your system and that
 you have at least some experience with managing [PostgreSQL|http://www.postgresql.org/].
 
 Unless you want Postxdb to use an existing database, create a database and a user/role that owns it.
-You will need superuser access.
+You will need admin (the @postgres@ user) access.
 The following simple example creates a database user called @orbeonuser@ and a database named @orbeondb@.
 You may freely change these names and obviously set your own password for the database user.
-(By convention, @postgres@ is the OS user with PostgreSQL full admin privileges.)
+(By convention, @postgres@ is the OS username with PostgreSQL full admin privileges.)
 {code}
 sudo su - postgres
 postgres@host:~$ psql
@@ -21,7 +21,7 @@ postgres@host:~$ psql -U orbeonuser orbeondb
 {code}
 
 If you get an error message in spite of entering the correct password you must edit a PostgreSQL configuration file.
-In this case you need superuser access.
+In this case you need superuser (@root@) access.
 The file to edit is @/etc/postgresql/${version}/${cluster}/pg_hba.conf@ where @${version}@ stands
 for the PostgreSQL version (like @9.3@) and @${cluster}@ stands for a cluster name (like @main@).
 (Details of file names may vary between *nix distributions.)

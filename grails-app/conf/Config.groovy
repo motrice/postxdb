@@ -152,7 +152,7 @@ environments {
 
 // Documentation properties
 grails.doc.title = 'Postxdb Backend'
-grails.doc.subtitle = 'Persistence for Orbeon Forms'
+grails.doc.subtitle = 'Helpful Persistence for Orbeon Forms'
 grails.doc.authors = 'Håkan Söderström, Motrice AB'
 
 // log4j configuration
@@ -175,7 +175,7 @@ log4j = {
            'net.sf.ehcache.hibernate',
            'org.hibernate'
 
-    error 'org.motrice.postxdb', 'grails.app.controllers', 'org.motrice.postxdb.RestService' , 'org.motrice.postxdb.PostxdbService', 'org.motrice.postxdb.ItemService', 'org.motrice.postxdb.CallbackManager'
+    debug 'org.motrice.postxdb', 'grails.app.controllers', 'org.motrice.postxdb.RestService' , 'org.motrice.postxdb.PostxdbService', 'org.motrice.postxdb.ItemService', 'org.motrice.postxdb.ConfigService', 'org.motrice.postxdb.CallbackManager'
 }
 
 // Timestamp format in responses to Orbeon
@@ -184,7 +184,5 @@ postxdb.tstamp.fmt = "yyyy-MM-dd'T'HH:mm:ss.SSS"
 postxdb.regular.fmt = "yyyy-MM-dd_HH:mm:ss"
 // Header used to return item paths
 postxdb.itempath.header = "X-Postxdb-Itempath"
-// Base URL where Orbeon Form Builder is found
-postxdb.formBuilder.urlBase = "http://localhost:8080/orbeon/fr/orbeon/builder"
-// Base URL where Orbeon Form Runner is found
-postxdb.formRunner.urlBase = "http://localhost:8080/orbeon/fr"
+// Base URL where Orbeon is running
+postxdb.orbeon.urlBase = "http://localhost:8080/orbeon/fr"

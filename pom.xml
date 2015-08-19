@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     
     <groupId>org.motrice</groupId>
-    <artifactId>exist</artifactId>
+    <artifactId>postxdb</artifactId>
     <packaging>grails-app</packaging>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
 
-    <name>exist</name>
-    <description>exist</description>
+    <name>postxdb</name>
+    <description>Postxdb: Helpful Persistence for Orbeon Forms</description>
 
     <properties>
         <grails.version>2.4.5</grails.version>

@@ -3,14 +3,14 @@ We use the term *eXist-db methods* for this category, even though it refers to a
 
 The URL used in eXist-db methods has a constant prefix
 {code}
-/exist/rest/db/orbeon-pe/fr
+/postxdb/rest/db/orbeon-pe/fr
 {code}
 This is indicated by the symbol @$PREFIX@ below.
 
 Postxdb also offers a number of non-eXist-db methods referred to as *Postxdb Methods*.
 Such methods have the prefix
 {code}
-/exist/postxdb
+/postxdb/postxdb
 {code}
 The symbol @$POSTXDB@ is used for this prefix.
 
@@ -30,3 +30,6 @@ Each one is implemented as a database table (name in parentheses).
 * Form definition (@pxd_formdef@): common metadata for a number of versions of a form definition
 * Form definition version (@pxd_formdef_ver@): metadata for a specific form version
 * Item (@pxd_item@): the substance of a form definition or a form instance, that is, XML or an attachment
+
+The best place for database schema documentation is the _gapi_ documentation, the following classes:
+@PxdFormdef@, @PxdFormdefVer@, @PxdItem@.

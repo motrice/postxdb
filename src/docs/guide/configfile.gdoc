@@ -14,3 +14,4 @@ The first one that is defined is used.
 
 The file @/usr/local/etc/motrice/motrice.properties@ is used if none of the above is defined.
 If that file does not exist, or is not readable, a fallback configuration with a built-in H2 database is used.
+The fallback is there to simplify demos and first quick looks.
