@@ -7,7 +7,7 @@
     <groupId>org.motrice</groupId>
     <artifactId>postxdb</artifactId>
     <packaging>grails-app</packaging>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
 
     <name>postxdb</name>
     <description>Postxdb: Helpful Persistence for Orbeon Forms</description>

@@ -8,6 +8,12 @@ http://localhost:8080/postxdb
 {code}
 assuming it runs on port 8080.
 
+The database browser has the following localizations.
+The language you see depends on your web browser settings.
+
+* English
+* Swedish
+
 h4. Overview
 
 The top of the window has a menu strip with the following top items,
