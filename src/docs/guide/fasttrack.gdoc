@@ -27,7 +27,7 @@ In @properties-local.xml@, add the following entries,
      value="http://localhost:48080/postxdb/rest/db/orbeon-pe/fr"/>
 {code}
 
-Be sure to comment out the previous @oxf.fr.persistence@ configuration entries.
+Be sure to comment out any previous @oxf.fr.persistence@ configuration entries.
 This example assumes the servlet container runs on localhost, port 8080.
 Modify if needed.
 

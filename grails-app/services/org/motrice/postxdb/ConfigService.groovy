@@ -32,6 +32,9 @@ import org.apache.commons.logging.LogFactory
 class ConfigService {
   private static final log = LogFactory.getLog(this)
 
+  public static LIVENESS_PROBLEM = 'config.liveness.problem'
+  public static RESOURCE_PREFIX = 'config.item.'
+
   // No database stuff in this service
   static transactional = false
 
@@ -127,6 +130,7 @@ class ConfigService {
    * Create a list of important configuration settings, some with liveness
    */
   List configDisplay() {
+    if (log.debugEnabled) log.debug "configDisplay <<"
     def list = []
     // If you ask for a non-configured configuration item the response is an empty Map.
     // Use ?: to convert to null and avoid complications.
@@ -147,7 +151,34 @@ class ConfigService {
 		      grailsApplication.config.postxdb.orbeon.urlBase ?: null)
     orbeonLive(list, item)
 
+    if (log.debugEnabled) log.debug "configDisplay >> ${list}"
     return list
+  }
+
+  /**
+   * Same as configDisplay, but some post-processing to adapt the result for
+   * XML output.
+   */
+  List configRest() {
+    def list = configDisplay()
+    def map = [:]
+    def restList = list.inject([]) {list2, entry ->
+      entry.name = makeLabel(entry.name)
+      if (entry.value == '--') entry.value = null
+      map[entry.name] = entry
+      if (entry.ref) {
+	def refName = makeLabel(entry.ref)
+	def refEntry = map[refName]
+	if (refEntry) refEntry.message = entry.value
+      } else {
+	list2.add(entry)
+      }
+
+      return list2
+    }
+
+    if (log.debugEnabled) log.debug "configRest >> ${restList}"
+    return restList
   }
 
   private Map configItem(String resourceName, String value) {
@@ -162,8 +193,13 @@ class ConfigService {
     return item
   }
 
-  private Map problemItem(String message) {
-    [name: 'config.liveness.problem', value: message, state: STATE_DIAGNOSTIC]
+  private String makeLabel(String name) {
+    name?.startsWith(RESOURCE_PREFIX)? name.substring(RESOURCE_PREFIX.size()) : name
+  }
+
+  private Map problemItem(String message, String ref) {
+    [name: LIVENESS_PROBLEM, value: message, state: STATE_DIAGNOSTIC,
+    ref: ref]
   }
 
   /**
@@ -173,39 +209,14 @@ class ConfigService {
    */
   private dataSourceLive(List list, Map item) {
     if (item.state == STATE_CONFIGURED) {
-      def cnx = null
-      def rs = null
       try {
-	cnx = dataSource.connection
-	def meta = cnx.metaData
-	def tableNames = []
-	rs = meta.getTables(null, null, 'pxd_%', null)
-	while (rs.next()) {
-	  tableNames.add(rs.getString(3))
-	}
-	if (tableNames.size() >= 3) {
-	  item.state = STATE_OPERATIONAL
-	  list << item
-	} else {
-	  item.state = STATE_INOPERATIVE
-	  list << item
-	  list << problemItem("Tables found: ${tableNames}")
-	}
+	def formCount = PxdFormdef.count()
+	item.state = STATE_OPERATIONAL
+	list << item
       } catch (Exception exc) {
 	item.state = STATE_INOPERATIVE
 	list << item
-	list << problemItem(exc.message)
-      } finally {
-	try {
-	  rs?.close()
-	} catch (Exception exc2) {
-	  // Ignore
-	}
-	try {
-	  cnx?.close()
-	} catch (Exception exc2) {
-	  // Ignore
-	}
+	list << problemItem(exc.message, item.name)
       }
     } else {
       list << item
@@ -228,7 +239,7 @@ class ConfigService {
       } catch (Exception exc) {
 	item.state = STATE_INOPERATIVE
 	list << item
-	list << problemItem(exc.message)
+	list << problemItem(exc.message, item.name)
       }
     } else {
       list << item

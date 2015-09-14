@@ -33,12 +33,35 @@ import grails.converters.*
  */
 class RestPostxdbController {
   // Service injection
+  def configService
   def postxdbService
   def restService
   // For accessing the config
   def grailsApplication
 
   static CONT_DISP = 'Content-Disposition'
+
+  /**
+   * Check the configuration and return results.
+   */
+  def configuration () {
+    if (log.debugEnabled) log.debug "CONFIGURATION: ${Util.clean(params)}, ${request.forwardURI}"
+    def configList = configService.configRest()
+    def writer = new StringWriter()
+    writer.write('<?xml version="1.0" encoding="UTF-8"?>')
+    def xml = new groovy.xml.MarkupBuilder(writer)
+    xml.configuration {
+      configList.each {record ->
+	if (record.message) {
+	  entry(name: record.name, state: record.state, diagnostic: record.message, record.value)
+	} else {
+	  entry(name: record.name, state: record.state, record.value)
+	}
+      }
+    }
+
+    render(status: 200, contentType: "application/xml;charset=UTF-8", text: writer.toString())
+  }
 
   /**
    * Get form definition metadata (PxdFormdef).

@@ -7,6 +7,40 @@ Almost all methods in this section return metadata.
 
 In all methods, @$id@ denotes a 64-bit integer database id.
 
+h2. Get Configuration
+
+Get configuration entries of a running Postxdb instance.
+
+{code}
+GET $PREFIX/configuration
+{code}
+
+Returns an XML structure. The output is a list of configuration entries.
+Here is a sample containing all possible states.
+{code:xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <entry name='applicationName' state='1'>postxdb</entry>
+  <entry name='applicationVersion' state='1'>1.1.6</entry>
+  <entry name='allowAddLanguage' state='2' />
+  <entry name='callback.sourcePort' state='2' />
+  <entry name='callback.destPort' state='2' />
+  <entry name='dataSource' state='3'>jdbc:h2:work/postxdb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE</entry>
+  <entry name='orbeonBaseUri' state='4' diagnostic='Connection refused'>http://localhost:8080/orbeon/fr</entry>
+</configuration>
+{code}
+
+The names of entries are the same as in the Postxdb configuration file, dropping the initial @config.item.@ where applicable.
+The special entries @applicationName@ and @applicationVersion@ are generated from the application name and version, respectively.
+
+The state is an integer value with this meaning:
+* 1 Configured
+* 2 Not Configured
+* 3 Configured and Operational
+* 4 Configured but Inoperative
+
+An entry with state 4 also contains a @diagnostic@ attribute.
+
 h2. Store Initial Instance
 
 Create an empty form instance and report back its uuid.

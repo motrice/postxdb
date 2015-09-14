@@ -6,15 +6,15 @@ All necessary XML processing is done by Postxdb, none is expected from the datab
 This is an important key to portability since databases differ greatly in their XML capabilities.
 
 Postxdb has a number of features that aid Orbeon integration with other applications.
-The most important one may be that all form metadata is immediately available through plain SQL,
+The most important one may be that form metadata is immediately available through plain SQL,
 no XML processing is necessary.
 
 Postxdb needs a servlet container (like, for instance, [Apache Tomcat|http://tomcat.apache.org/])
 and a SQL database.
 Postxdb has been tested extensively with Apache Tomcat and the [PostgreSQL database|http://www.postgresql.org/].
 Other databases that work in our tests are H2 and MySQL.
-Postxdb relies on [Hibernate|http://hibernate.org/] for its database transactions
-and Hibernate works with most relational databases, and then some.
+Postxdb relies on [Hibernate|http://hibernate.org/] for its database transactions.
+Hibernate works with most relational databases, and then some.
 This is the reason we expect other databases to be added to the list without great efforts.
 
 Postxdb creates its tables automatically, you only have to provide a suitable database.
