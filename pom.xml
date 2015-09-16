@@ -137,6 +137,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}.war</finalName>
         <pluginManagement/>
 
         <plugins>
