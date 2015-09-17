@@ -82,18 +82,20 @@ class CallbackManager {
   /**
    * Callback indicating creation of a draft form definition item.
    */
-  def draftFormdefItem(PxdFormdef formdef, PxdFormdefVer formdefVer, PxdItem item) {
+  def draftFormdefItem(PxdFormdef formdef, PxdFormdefVer draftFormdefVer, PxdItem item) {
     if (threadPool) {
-      doCallback('draftFormdefItem', formdef, formdefVer, item, false, false)
+      doCallback('draftFormdefItem', formdef, null, draftFormdefVer, item, false)
     }
   }
 
   /**
    * Callback indicating creation of a published form definition item.
    */
-  def publishedFormdefItem(PxdFormdef formdef, PxdFormdefVer formdefVer, PxdItem item) {
+  def publishedFormdefItem(PxdFormdef formdef, PxdFormdefVer publishedFormdefVer, PxdFormdefVer draftFormdefVer,
+			   PxdItem item)
+  {
     if (threadPool) {
-      doCallback('publishedFormdefItem', formdef, formdefVer, item, false, true)
+      doCallback('publishedFormdefItem', formdef, publishedFormdefVer, draftFormdefVer, item, false)
     }
   }
 
@@ -102,7 +104,7 @@ class CallbackManager {
    */
   def saveInstanceItem(PxdItem item) {
     if (threadPool) {
-      doCallback('saveInstanceItem', null, null, item, true, false)
+      doCallback('saveInstanceItem', null, null, null, item, true)
     }
   }
 
@@ -111,14 +113,14 @@ class CallbackManager {
    */
   def emptyInstanceItem(PxdItem item) {
     if (threadPool) {
-      doCallback('emptyInstanceItem', null, null, item, true, false)
+      doCallback('emptyInstanceItem', null, null, null, item, true)
     }
   }
 
-  private doCallback(String op, PxdFormdef formdef, PxdFormdefVer formdefVer, PxdItem item,
-		     boolean instance, boolean published)
+  private doCallback(String op, PxdFormdef formdef, PxdFormdefVer publishedFormdefVer, PxdFormdefVer draftFormdefVer,
+		     PxdItem item, boolean instance)
   {
-    def message = "{\"op\":\"${op}\",\"formdefId\":${formdef?.id},\"formdefVerId\":${formdefVer?.id},\"itemId\":${item?.id},\"instance\":${instance},\"published\":${published}}|||"
+    def message = "{\"op\":\"${op}\",\"formdefId\":${formdef?.id},\"publishedFormdefVerId\":${publishedFormdefVer?.id},\"draftFormdefVerId\":${draftFormdefVer?.id},\"itemId\":${item?.id},\"instance\":${instance}}|||"
     def job = new CallbackJob(socket, tgtPortNumber, message)
     if (log.debugEnabled) log.debug "callback << '${message}' on port ${tgtPortNumber}"
     threadPool.submit(job)

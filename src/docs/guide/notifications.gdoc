@@ -23,10 +23,10 @@ The following keys are defined in every notification even though some values are
 
 * *op* (string): Event name (see below)
 * *formdefId* (long): Database id of the form definition affected
-* *formdefVerId* (long): Database id of the form definition version affected
+* *publishedFormdefVerId* (long): Database id of the published form definition version
+* *draftFormdefVerId* (long): Database id of the current draft form definition version
 * *itemId* (long): Database id of the affected item (XML or attachment)
 * *instance* (boolean): true if the affected item was a form instance item
-* *published* (boolean): true if the form definition was published
 
 The following event names are defined:
 * *draftFormdefItem*: A draft form definition item was saved

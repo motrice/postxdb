@@ -391,9 +391,9 @@ class RestService {
     if (log.debugEnabled) log.debug "createPublishedItem new current draft ${currentDraftItem}"
 
     // Create a new form definition version for the new current draft
-    doCreateFormdefVer(formdef, currentDraftVersion, meta)
-
-    callbackManager.publishedFormdefItem(formdef, publishedFormdefVer, publishedItem)
+    def currentDraftFormdefVer = doCreateFormdefVer(formdef, currentDraftVersion, meta)
+    callbackManager.publishedFormdefItem(formdef, publishedFormdefVer, currentDraftFormdefVer,
+					 publishedItem)
     return publishedItem
   }
 
