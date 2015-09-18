@@ -1,0 +1,39 @@
+Postxdb has been thoroughly tested with the Apache Tomcat servlet container.
+Other servlet containers may be added to this description over time.
+
+As distributed, the Postxdb war file is named @postxdb-n.n.n.war@ where @n.n.n@ is the version number.
+
+You probably already have Orbeon Forms running in a servlet container.
+In such case an easy option is to add Postxdb as an additional servlet in the same container.
+
+Continue with one of the following subsections, depending on your choice of servlet container.
+
+h4. Apache Tomcat
+
+If you install a separate Tomcat for Postxdb, be sure to edit @conf/server.xml@ to use
+a different port than Orbeon Forms.
+
+Rename the Postxdb war file (@postxdb-n.n.n.war@) to @postxdb.war@ (no version number).
+Drop it into the Tomcat @webapps@ directory.
+
+Unless you use the default H2 database you will need
+to set an environment variable that points to the Postxdb configuration file.
+Conventionally this is done in a file named @bin/setenv.sh@ (@setenv.bat@ on Windows).
+As for environment variable names, see [The Postxdb Configuration File|guide:configfile].
+
+During database setup you may find that you have to add a JDBC driver.
+Add it to @webapps/exist/WEB-INF/lib@.
+This assumes the war file has been expanded.
+You may expand it manually or just start and stop Tomcat, ignoring error messages.
+
+h4. Other Generic Servlet Container
+
+Rename the Postxdb war file (@postxdb-n.n.n.war@) to @postxdb.war@ (no version number)
+before adding it to the servlet container.
+
+Unless you use the default H2 database you will need
+to set an environment variable at startup.
+For details, see [The Postxdb Configuration File|guide:configfile].
+
+During database setup you may find that you have to add a JDBC driver.
+Add it to a location on the Postxdb servlet classpath.

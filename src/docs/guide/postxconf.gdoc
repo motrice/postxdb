@@ -1,0 +1,75 @@
+Database configuration is one of the main parts of a Postxdb setup.
+The [database setup|guide:databasesetup] description contains examples of this part of the configuration.
+Regardless of database, the following properties are needed:
+{code}
+dataSource.driverClassName = <fully qualified Java class name>
+dataSource.username = orbeonuser
+dataSource.password = howdy!howdy
+dataSource.url = jdbc:...
+dataSource.dbCreate = update
+{code}
+where @orbeonuser@ is a database user that has database access.
+Its privileges must include create table and select/insert/update.
+You may freely use a different name for this user, and (of course) some other password.
+
+By default the Postxdb GUI expects Orbeon to run on port 8080 on localhost
+according to the property below.
+If this is the desired behavior you don't have to include this property.
+Modify accordingly if Orbeon does not run on @localhost:8080@.
+Set the property to an empty value if you want to avoid linking to Orbeon.
+{code}
+postxdb.orbeon.urlBase = http://localhost:8080/orbeon/fr
+{code}
+
+If you want storage notifications, then add the following configuration entries.
+{code}
+postxdb.callback.source.port = 25759
+postxdb.callback.destination.port = 25758
+{code}
+
+This example means that Postxdb uses port 25759 to send notifications.
+It will send them to port 25758 on the same host.
+You may, of course, pick different port numbers.
+It is not possible (nor advisable at this stage) to send notifications to other hosts.
+
+If you want to allow languages to be added to forms from the Postxdb browser,
+set the following property.
+{code}
+postxdb.gui.allowAddLanguage = true
+{code}
+
+There is a similar configuration item to allow the REST API to add languages.
+It is described among the [Postxdb methods|guide:restpostx] in the API documentation.
+
+h4. Configuration for Building Postxdb
+
+A configuration must be defined if you build Postxdb from source.
+You specify the configuration file using an environment variable or system property as [described here|guide:configfile].
+The main difference is that you need a separate test database unless you turn off all testing during the build.
+Create the database the same way you created the main database, and do not create any tables.
+Integration tests assume they run against a completely empty database.
+
+This is how the test database is specified:
+If the normal configuration file path is @/some/directory/app-conf.properties@ then add a file in the same directory named
+@test-app-conf.properties@, that is, prepend @test@ to the configuration file name.
+Postxdb will read the normal configuration first, and then the test configuration.
+Any entries in the test configuration override the values in the normal configuration.
+
+For example, if the test database uses the same username and password as the main database, the test configuration
+could look like this:
+{code}
+dataSource.url = jdbc:postgresql://{host}:{port}/{TEST database name}
+dataSource.dbCreate = create-drop
+{code}
+
+If you prefer, it's perfectly possible to have a completey separate test configuration file and
+change the environment variable accordingly.
+
+The ''create-drop'' setting means that database tables will be created automatically and also dropped automatically after tests have completed.
+
+If the test database uses a different username or password, add those properties to the test configuration file. 
+
+If you build Postxdb without a separate test database, data will be written to whatever database is configured.
+Tests will fail if you repeat them because they expect a clean database.
+
+A typical build command is @mvn clean install@ (using Maven).

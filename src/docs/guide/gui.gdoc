@@ -1,0 +1,93 @@
+Postxdb comes with a database browser intended for developers.
+It gives developers easy access to database contents.
+There is no user authentication.
+
+When Postxdb is running, point your web browser to
+{code}
+http://localhost:8080/postxdb
+{code}
+assuming it runs on port 8080.
+
+The database browser has the following localizations.
+The language you see depends on your web browser settings.
+
+* English
+* Swedish
+
+h4. Overview
+
+The top of the window has a menu strip with the following top items,
+
+* Forms
+* Contents
+* (Under the icon) Show Configuration
+
+The _Show Configuration_ menu item is a handy way of checking if Orbeon is running
+and reachable from the browser.
+It also shows a few other configuration items.
+
+This description assumes your intention is to allow connections from the database
+browser to Orbeon Form Builder and Form Runner.
+You may choose not to allow connections to Orbeon.
+In such case some options are not shown in the database browser.
+
+Under _Forms_ you may either list available forms or create a new form in Form Builder.
+
+Under _Contents_ you may inspect form data and attachments.
+
+h4. Forms and Contents
+
+The term _Contents_ as used in the database browser needs some explanation.
+In Postxdb, everything that is not metadata is _Contents_, sometimes referred to as _items_.
+An item may be,
+
+* a form definition,
+* form data (a filled-out form),
+* an attachment (an image, for example) attached either to a form definition or to form data
+
+The handle to contents is usually a uuid, a long string of random characters,
+not very suitable for human consumption, but useful for software.
+You will see the term _uuid_ here and there in the database browser.
+
+h4. More on Forms
+
+The _All Forms_ menu choice lists all form definitions in alphabetical order.
+Some of the headers are clickable if you want a different sort key or a different sort order.
+
+In the list you may click the _Apply_ icon to create a new form instance in Form Runner,
+or the _Edit_ icon to edit the form definition in Form Builder.
+More exactly, the form instance will be created from the latest published version of the form,
+Form Builder will work on the current draft of the form.
+
+Every name in the list of forms is a collection of a number of versions.
+Click the form name to see all versions.
+Drafts have a draft number at the end, published versions have no draft number.
+
+Click on a specific form version and you will see its details.
+There is also a _Browse Contents_ button in the lower part of the page.
+This button will list contents related to exactly this form version.
+If there are filled out forms from this version you will see them.
+In any case the form definition itself will be listed.
+
+h4. More on Contents
+
+There are several ways to end up in a Contents page, listing a number of items.
+One of the columns has the header _Cat_ (category).
+Its value is either _Def_ or _Inst_, meaning form definition and form instance, respectively.
+
+Some items are form instances (the term _form data_ is also used).
+Their paths are links to Form Runner.
+
+All items have their _Uuid_ linked.
+Clicking a uuid link will show you details of the item.
+The contents will be shown if it is XML.
+All types of contents can be downloaded.
+
+h4. Words of Caution
+
+Please be aware that the Postxdb database browser is intended for developers,
+not end users.
+There are some Delete options that should not be taken lightly.
+You may edit some XML contents.
+Avoid these operations unless you are fully aware of the consequences.
+Random use will likely disrupt normal operation of your application and/or cause loss of data.

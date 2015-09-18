@@ -1,0 +1,32 @@
+Postxdb can be run on [MySQL|https://www.mysql.com/] versions 5.0.3 and above.
+
+Create a database using the UTF-8 charset.
+Here is an example that assumes that you have the root password in MySQL.
+It creates a database named @orbeon@ and a user @orbeonuser@ with password @howdy!howdy@.
+{code}
+mysql -p --user=root mysql
+create user 'orbeonuser'@'localhost' identified by 'howdy!howdy';
+create schema orbeon character set='utf8';
+grant all privileges on orbeon.* to 'orbeonuser'@'localhost';
+{code}
+
+Adjust the example as needed.
+MySQL has a large set of options.
+This example just shows one of many available configuration options.
+
+Add the following lines to the Postxdb configuration file.
+{code}
+dataSource.url = jdbc:mysql://localhost:3306/orbeon?useUnicode=true&characterEncoding=UTF8
+dataSource.driverClassName = com.mysql.jdbc.Driver
+dataSource.dialect = org.hibernate.dialect.MySQL5InnoDBDialect
+dataSource.username = orbeonuser
+dataSource.password = howdy!howdy
+dataSource.dbCreate = update
+{code}
+
+Replace username, password and database name as needed.
+The number @3306@ is the default MySQL port number.
+Change if needed.
+
+Download a suitable version of the MySQL JDBC connector.
+Add it to the servlet container as described in [Set Up The Servlet Container|guide:servletcontainersetup].

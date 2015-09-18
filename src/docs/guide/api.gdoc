@@ -1,0 +1,35 @@
+Postxdb emulates the Orbeon REST interface for eXist-db XML persistence.
+We use the term *eXist-db methods* for this category, even though it refers to an Orbeon API, not eXist-db.
+
+The URL used in eXist-db methods has a constant prefix
+{code}
+/postxdb/rest/db/orbeon-pe/fr
+{code}
+This is indicated by the symbol @$PREFIX@ below.
+
+Postxdb also offers a number of non-eXist-db methods referred to as *Postxdb Methods*.
+Such methods have the prefix
+{code}
+/postxdb/postxdb
+{code}
+The symbol @$POSTXDB@ is used for this prefix.
+
+In method descriptions a dollar sign before a URL element indicates a variable.
+
+Several operations have two cases, one for XML data (the form or form data), one for resources.
+A resource is anything that is not XML, usually binary.
+Postxdb (and eXist-db) uses the @Content-Type@ header to distinguish between the cases.
+
+As from Orbeon 4.3 Orbeon only accepts empty 200 or 201 responses (200 and 201 being HTTP response codes).
+
+h4. Metadata And Items
+
+The Postxdb data model has three main concepts.
+Each one is implemented as a database table (name in parentheses).
+
+* Form definition (@pxd_formdef@): common metadata for a number of versions of a form definition
+* Form definition version (@pxd_formdef_ver@): metadata for a specific form version
+* Item (@pxd_item@): the substance of a form definition or a form instance, that is, XML or an attachment
+
+The best place for database schema documentation is the _gapi_ documentation, the following classes:
+@PxdFormdef@, @PxdFormdefVer@, @PxdItem@.

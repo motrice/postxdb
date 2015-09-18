@@ -1,0 +1,31 @@
+This section describes how to install and get started with Postxdb.
+See the [Fast Track|guide:fasttrack] section for the quickest possible setup of a demo environment.
+
+Before you start, here is the bill of materials, things you need for a successful installation.
+
+1. Orbeon Forms installed in a servlet container. At the time of writing, Orbeon versions 3.9 to 4.9 are known to work, with some reservations for Orbeon 4.8.
+1. The Postxdb distribution war file (named @postxdb-n.n.n.war@ where @n.n.n@ is a version)
+1. Admin access to a relational database system
+1. For databases other than H2 and PostgreSQL you need a JDBC driver
+
+h4. The Postxdb Configuration File
+
+Begin by deciding a name and location for the Postxdb configuration file.
+It will contain some sensitive information, in particular database username and password.
+Make sure it can only be read by the Postxdb servlet user.
+A suitable location under Linux might be a directory in @/usr/local/etc/@.
+
+The configuration file is a @.properties@ text file formatted according to @java.util.Properties@.
+
+h4. Installation Steps
+
+Use this list for installation.
+Each item is a link to a description.
+Return here after each step.
+
+1. [Set up a servlet container|guide:servletcontainersetup]
+1. [Set up a database|guide:databasesetup]
+1. Finalize [Postxdb configuration|guide:postxconf]
+1. [Configure Orbeon|guide:orbeonconf] for Postxdb
+
+After these steps you are ready to run Orbeon with Postxdb persistence.

@@ -1,0 +1,17 @@
+The Postxdb configuration file is a @.properties@ text file formatted according to @java.util.Properties@.
+Create this file in a location reachable and readable only by the user running the servlet container.
+
+Without explicit configuration Postxdb runs towards its built-in H2 database and without notifications.
+
+In order to point Postxdb to its configuration file you may use either a JVM system property or an environment variable.
+System properties and environment variables are examined in the following order.
+The first one that is defined is used.
+
+1. A system property named @POSTXDB_CONF@
+1. An environment variable named @POSTXDB_CONF@
+1. A system property named @MOTRICE_CONF@
+1. An environment variable named @MOTRICE_CONF@
+
+The file @/usr/local/etc/motrice/motrice.properties@ is used if none of the above is defined.
+If that file does not exist, or is not readable, a fallback configuration with a built-in H2 database is used.
+The fallback is there to simplify demos and first quick looks.

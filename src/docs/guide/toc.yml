@@ -1,0 +1,42 @@
+intro:
+  title: Postxdb Intro
+fasttrack:
+  title: The Fast Track
+getstarted:
+  title: Installation
+  servletcontainersetup:
+    title: Set Up The Servlet Container
+  databasesetup:
+    title: Set Up The Database
+    h2setup:
+      title: H2 On Any Platform
+    pgsetup:
+      title: PostgreSQL On Linux
+    mysqlsetup:
+      title: MySQL 5 Upwards
+configuration:
+  title: Configuration
+  configfile:
+    title: The Postxdb Configuration File
+  postxconf:
+    title: Postxdb Configuration
+  orbeonconf:
+    title: Orbeon Configuration
+features:
+  title: Features
+  versions:
+    title: Form Versions
+  notifications:
+    title: Storage Notifications
+gui:
+  title: The Database Browser
+api:
+  title: REST API
+  restexist:
+    title: eXist-db Methods
+    formdefrest:
+      title: Form Definitions
+    formdatarest:
+      title: Form Data (Form Instances)
+  restpostx:
+    title: Non-eXist-db Methods
